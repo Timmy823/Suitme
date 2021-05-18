@@ -1,0 +1,31 @@
+/* fadeOut logo background div */
+div.cover-enter-logo {
+  height: 100%;
+  min-width: 100%;
+  position: fixed;
+  top: 0;
+
+  background: rgba(12, 37, 49, 1);
+
+  overflow: scroll;
+  z-index: 200;
+}
+
+/* logo div contain img and horiental center */
+div.logo {
+  width: 30%;
+  position: relative;
+  top: 35%;
+  left: 35%;
+
+  cursor: pointer;
+
+  animation-duration: 1000ms;
+  /* delay seem to not work */
+  animation-iteration-count: 1;
+}
+
+/* logo img width fit as parent width */
+div.logo img {
+  width: 100%;
+}

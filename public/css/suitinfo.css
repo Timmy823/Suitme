@@ -1,0 +1,135 @@
+/* 08+09 */
+div.suit-info-box{
+	width: 100%;
+	height: 100%;
+	padding-top:66px;
+}
+
+div.suit-bg {
+	width: 100%;
+	height: auto; 
+	margin:0 ;
+	display:block;
+	z-index:-1;
+	position:absolute;
+	border:0;
+	background-size:cover;
+}
+
+div.suit-bg img {
+	width: 100%;
+	height: 100%;
+}
+
+/*popup出來以前的那個在身體附近的選擇區塊*/
+div.popup-selectorh{
+	background-color:rgba(153,204,204,0.7);
+	position:absolute;
+	width:15.8vw;
+	height:14.3vh;
+	cursor: pointer;
+}	
+div.popup-selectorv{
+	background-color:rgba(153,204,204,0.7);
+	position:absolute;
+	width:8.3vw;
+	height:23.8vh;
+	cursor: pointer;
+}	
+
+div.s-shoulder {top: 15%;right: 35%;}
+div.s-tie {top: 22%;left: 35%;}
+div.s-button {top: 114%;left: 40%;}
+div.s-pocket {top: 46%;left: 22%;}
+div.s-hand {top: 40%;right: 30%;}
+div.s-pants {top: 80%;right: 45%;}
+
+/*顯現出來的圖片*/	
+div.suit-popup {
+	position: fixed;
+	width: 30%;
+	height: 70%;
+	top: 0;
+	margin-left:35%;
+	margin-right:35%;
+	margin-top:15%;
+	background:rgba(66,101,103,1);
+	display:none;
+}
+
+div.suit-popup img{
+	position:absolute;
+	width: 54%;
+	height:auto;
+	margin:13% 23% 70% 23%;	
+	border:1px white solid;
+}
+
+div.suit-popup p{
+	color:white;
+	line-height: 1.2em;
+	
+  font-size: 20px;
+	margin: 55% 15% 10% 15%;
+}
+
+/*close button*/
+.buttonpop.b-close, .buttonpop.bClose {
+    border-radius: 7px 7px 7px 7px;
+    box-shadow: none;
+    font: bold 131% sans-serif;
+    padding: 0 6px 2px;
+    position: absolute;
+    right: -7px;
+    top: -7px;
+}
+.buttonpop {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+    color: #2b91af;
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+}
+/* .suit-popup{ display:none; cursor:pointer} */
+/*窄的樣子之後需要用到的參數放這裡面*/
+@media only screen and (max-width: 440px) {
+  div.suit-bg {
+		width: auto;
+		height: 100%; 
+		margin:0 ;
+		display:block;
+		z-index:-1;
+		position:absolute;
+  }
+
+	div.suit-bg img {
+		width: 100%;
+		height: inherit;	
+  }
+
+  /*選擇用的綠色那塊*/
+div.s-shoulder {top: 22vh;right: 35vw;}
+div.s-tie {top: 28vh;left: 31vw;}
+div.s-button {top: 44vh;left: 39vw;}
+div.s-pocket {top: 52vh;left: 18vw;}
+div.s-hand {top: 58vh;right: 28vw;}
+div.s-pants {top: 100vh;right: 40vw;}
+div.popup-selectorh{width:17.8vw;height:7.3vh;}
+div.popup-selectorv{width:13vw;height:10.6vh;}
+  /*跳出來的資訊面板*/
+
+	div.suit-popup {
+		width: 70%;
+		height: 70%;
+		top:0;
+		margin: 35% 10% 10% 10%;
+	
+	}
+	div.suit-popup p{
+		margin: 73% 13% 15% 15%;
+	}
+}

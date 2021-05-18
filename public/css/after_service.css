@@ -1,0 +1,173 @@
+  .font-white {
+    color: white;
+  }
+  .ui.grid {
+    margin: 0px;
+    padding:0px;
+  }
+  /* content box */
+  div.feedback-box {
+    
+    /* this hieght: 100% cause background 
+        doesn't sync move with upper dom*/
+    /*height: 100%;*/
+    width: 100%;
+
+    /* expanding by inner DOM */
+    overflow: auto;
+    padding-top: 66px !important;
+
+    /* background image cover */
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size:cover;
+
+    background-position: center;
+    background: rgba(16,38,51,0.4);
+  }
+
+
+  div.row.link-row {
+    padding-top: 40px!important;
+    padding-bottom: 0rem!important;
+  }
+
+  div.logout-container div.logout-box {
+    display: inline-block;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
+    width: auto;
+    background: rgba(216, 216, 216, 0.3);
+    cursor: pointer;
+  }
+  div.logout-box a {
+    color: white;
+  }
+  div.logout-box a:focus {
+    outline: none;
+  }
+  div.logout-container {
+    padding-right: 0em!important;
+  }
+
+  div.feedback-box>.main-row {
+    padding-top:0px!important;
+  }
+  div.choose-title-box  {
+    padding: 0px 0 10px 0!important;
+  }
+  div.select-box {
+    padding-top: 1rem!important;
+    padding-bottom: 2.3rem!important;
+    padding-left: 0rem!important;
+    padding-right: 0rem!important;
+  }
+
+  div.select-box select {
+    width: 100%;
+    height: 36px;
+    background: rgba(128, 128, 128, 0.5);
+    border: 2px solid rgba(255,255,255,1);
+    border-radius: 2px;
+
+    padding-left: 10px;
+    color: white;
+  }
+  div.select-box select:focus {
+    outline: none;
+  }
+
+
+  div.Q-title-box,
+  div.EV-title-box{
+    padding: 2rem 0 0.71rem 0!important;
+  }
+  div.EV-title-box{
+    padding: 37px 0 10px 0!important;
+  }
+  div.Q-title-box h2,
+  div.EV-title-box h2,
+  div.choose-title-box h2{
+    font-weight: 100;
+    font-size: 28px;
+    color: white;
+  }
+  div.question-box,
+  div.evaluation-box{
+    padding-right:0!important;
+    padding-left:0!important;
+  }
+  div.question-box .textarea,
+  div.evaluation-box .textarea {
+    background: white;
+    width: 100%;
+    padding: 5px 0px 89px 0px ;
+
+    filter:alpha(opacity=60);
+    opacity:0.6;
+    font-size: 20px;
+    color: #666666;
+  }
+  div.question-box .textarea:focus, 
+  div.evaluation-box .textarea:focus{
+    outline: none;
+  }
+
+  div.question-box .textarea::-webkit-input-placeholder,
+  div.evaluation-box .textarea::-webkit-input-placeholder{
+    color: #666666;;
+  }
+
+  div.question-box .textarea:-moz-placeholder,
+  div.evaluation-box .textarea:-moz-placeholder{
+    color: #666666;;
+  }
+
+  div.question-box .textarea::-moz-placeholder,
+  div.evaluation-box .textarea::-moz-placeholder{
+    color: #666666;;
+  }
+
+  div.question-box .textarea::-ms-placeholder,
+  div.evaluation-box .textarea::-ms-placeholder{
+    color: #666666;;
+  }
+  div.star_form {
+    padding:15px 0px 10px 0px!important;  
+  }
+  div.star_form>img{
+    display:block;
+    float:left;
+    width:30px;
+    height:auto;
+    margin-right:7px;
+  }
+  div.Q-given,
+  div.EV-given{
+    margin-left:195px;
+    padding-right: 0!important;
+  }
+  
+  div.Q-given input[type="submit"],
+  div.EV-given input[type="submit"]{
+    background: #102633;
+    border: 3px none rgb(0, 51, 51);
+    border-radius: 8px;
+
+    width: 100%;
+    padding: 10px 0px;
+
+    font-size: 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 1);
+  }
+
+  div.Q-given input[type="submit"],
+  div.EV-given input[type="submit"]{
+    outline: none;
+  }
+
+
