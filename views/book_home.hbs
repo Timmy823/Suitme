@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="/css/bookhome.css"></link>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
+<script src="/js/bookhome.js"></script>
+
+<div class="ui grid book-box">
+  <div class="row">
+    <div class="left floated left aligned eight wide column modify-container">
+      <div class="modify-box">
+        <a>
+          資料更改
+        </a>
+      </div>
+    </div>
+    <div class="right floated right aligned eight wide column logout-container">
+      <div class="logout-box">
+        <a>登出</a>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="fourteen wide column centered">
+      <div class="ui grid one column">
+
+        <div class="column img-box">
+          <div class="book-circular">
+            <img src="/img/shop/shop-1.jpg">
+          </div>
+        </div>
+        <div class="column name-box">
+          <h2>{{user.name}}</h2>
+        </div>
+        <div class="column select-box">
+          <select form="book_form" name="shop" class="select-styled">
+            <option value="" selected disabled>選擇店家</option>
+            {{#each shopList}}
+            <option value={{.}}>{{.}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="column select-box">
+          <select form="book_form" name="time" class="select-styled">
+            <option value="" selected disabled>選擇時間</option>
+            <option value="9" >9 am</option>
+            <option value="10" >10 am</option>
+            <option value="14" >2 pm</option>
+            <option value="15" >3 pm</option>
+          </select>
+        </div>
+
+        <div class="column phone-box">
+          <input class="uppercase" type="text" form="book_form" name="phone" placeholder="輸入聯絡電話" value="{{user.phone}}"></input>
+        </div>
+
+        <div class="column book-btn-box">
+          <input type="submit" class="uppercase" name="book-button" form="book_form" value="預約時間">
+        </div>
+        
+        <form id="book_form" action="/book" method="post">
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

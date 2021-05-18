@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="/css/login_page.css">
+<style>
+</style>
+
+<div class="ui grid login-box">
+  <div class="row">
+
+    <div class="fourteen wide column centered login-inner-box">
+
+      <div class="ui grid one column">
+        <div class="column">
+          <input type="text" form="login_form" name="account" placeholder="帳號" required autofocus>
+        </div>
+        <div class="column">
+          <input type="password" form="login_form" name="password" placeholder="密碼" required>
+        </div>
+
+        <div class="column or-box">
+          <h1 class="font-white">或</h1>
+        </div>
+
+        <div class="column">
+          <div class="login-third-part">
+            <div class="col">
+              <a href="#">
+                <img class="login-way-icon" src="/img/loginThirdPart/google.png">
+              </a>
+            </div>
+            <div class="col">
+              <a href="#">
+                <img class="login-way-icon" src="/img/loginThirdPart/fb.png">
+              </a>
+            </div>
+            <div class="col">
+              <a href="#">
+                <img class="login-way-icon" src="/img/loginThirdPart/twitter.png">
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <button class="btn-as-link login-btn" type="submit" form="login_form">登入</button>
+        </div>
+
+        <div class="column lower-box">
+          <div class="ui grid two column">
+            <div class="column">
+              <a class="btn-as-link" href="/register">建立註冊</a>
+            </div>
+            <div class="column">
+              <a class="btn-as-link" href="#">忘記密碼</a>
+            </div>
+          </div>
+        </div>
+
+        <form id="login_form" action="/login" method="post">
+        </form>
+        <div class="column">
+          account: nekoneko<br>
+          password: ss12345678
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
