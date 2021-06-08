@@ -2,12 +2,12 @@
 const http = require('http');
 var express = require('express');
 var exphbs = require('express-handlebars');
-var bodyParser = require('body-parser');
 var session = require('express-session');
 var redis = require('redis');
 var redisStore = require('connect-redis')(session);
 
 var userdb = require('./lib/userdb.js');
+var mail = require('./lib/mail.js');
 
 const port = 5000
 var app = express();
@@ -53,8 +53,20 @@ app.use(session({
 //   next() // otherwise continue
 // })
 app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+
+//The express.json() and express.urlencoded() middleware have been added to provide request body parsing support.
+/*
+    When extended is set to false, it's parsed by query-string library. The object returned by querystring.parse() method does not 
+    phototypically inherit from JavaScript Object. This means typicalObject methods will not work; that is, the object has null phototype.
+    Use JSON.stringify() transforms any object into json string {" ": " "}, and use JSON.parse() transforms into javscript object.
+
+    When extended is set to false, it's parsed by qs library.
+    However, query-string.parse() can't resolve multiple levels, and qs.parse() only reslove at least five levels.Therefore, use JSON.stringify()
+    and JSON.parse().
+
+*/
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 
 function sessExist(req, res, next) {
@@ -87,8 +99,7 @@ app.post('/beforeAfter',(req, res) =>{
 });
 //  such as restful api
 app.post('/selectStore', (req, res)=> {
-  req.session.shop = req.body;
-  console.log(req.session.shop);
+  req.session.shop = JSON.parse(JSON.stringify(req.body));
   console.log(req.session);
   res.status(200).send({
     redirectUrl: '/venderHome'
@@ -97,30 +108,42 @@ app.post('/selectStore', (req, res)=> {
 
 /* login restful api */
 app.post('/login',(req, res)=>{
-  var login = req.body;
-  /* if havn't loged in */
-
-  userdb.GetAccountCheck('account',{
-    account: login.account,
-    password: login.password
-  }, function(error, data) {
-    console.log('login post api testing for myGetAccountCheck');
-    console.log(data);
-    /* if login success, redirect to /user  */
-    if ( typeof data !== 'undefined' ) {
-      req.session.user = data;
-      if((typeof req.session.hour === 'string')&&(req.session.hour == 'beforelog')) {
-        res.redirect(303,'/bookHome');
+  var login = JSON.parse(JSON.stringify(req.body));
+  console.log(login);
+  /* if haven't loged in */
+  if((typeof Object.keys(login)[0] === 'string')&&(Object.keys(login)[0] == 'Choice')) {
+    req.session.afterMenu = req.body.Choice;
+    res.status(200).send({succLogin: false, redirectUrl: '/login'});
+  }
+  else {
+    userdb.GetAccountCheck('account',{
+      account: login.account,
+      password: login.password
+    }, (error, data)=>{
+      console.log('login post api testing for myGetAccountCheck');
+      console.log(data);
+      if ( typeof data !== 'undefined' ) {
+        req.session.user = data;
+        if((typeof req.session.hour === 'string')&&(req.session.hour == 'beforelog')) {
+          res.status(200).send({succLogin: true, redirectUrl: '/bookhome'});
+        }
+        else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog'))  {
+          if((typeof req.session.afterMenu === 'string')&&( req.session.afterMenu == 'service')) {
+            res.status(200).send({succLogin: true, redirectUrl: '/afterService'});
+          }
+          else{
+            res.status(200).send({succLogin: true, redirectUrl: '/suitProcess'});
+          }
+        }
+        else {
+          res.status(200).send({succLogin: true, redirectUrl: '/bookhome'});
+        }
+      // else, login faill, redirect to /login_page
+      } else {
+        res.status(200).send({succLogin: false, redirectUrl: '/login'});
       }
-      else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog')){
-        res.redirect(303,'/suitProcess');
-      }
-    /* else, login faill, redirect to /login  */
-    } else {
-      res.redirect(303,'back');
-    }  
-  });
-
+    });
+  }
 });
 
 app.post('/logout', (req, res) =>{
@@ -180,7 +203,27 @@ app.post('/register', (req, res)=>{
     }
   });
 });
-
+app.post('/forget', (req, res) =>{
+  console.log(req.body);
+  userdb.GetDataBase('account',JSON.parse(req.body),['email','password'],
+    (err,reply) => {
+      console.log(reply);
+      if(typeof reply !== 'undefined'){
+        //send-email
+        mail.SendMail(reply[0][0],reply[1][0]);
+        res.status(200).send({
+          redirectUrl:'/login'
+        });
+      }
+      else{
+        console.log('The account does not exist!.');
+        res.status(200).send({
+          redirectUrl:'/forget'
+        });
+      }
+    }
+  );
+});
 /* GET home page. */
 app.get('/', (req, res)=>{
 	res.render('home', {layout: 'main_non_nav'});
@@ -208,7 +251,7 @@ app.get('/venderHome', (req, res)=>{
     'shop_info',
     shop,
     ['themeImg'],
-    function(error, data) {
+    (error, data) =>{
       if (typeof data !== 'undefined' && data[0] instanceof Array) {
         console.log(data[0]);
 
@@ -223,8 +266,8 @@ app.get('/venderHome', (req, res)=>{
             bottom: data[0][3]
           },
           prev: {
-            href: '/selectStore',
-            title: 'selectStore'
+            href: '/',
+            title: 'beforeAfter'
           }
         });
       }
@@ -237,7 +280,7 @@ app.get('/venderHistory', (req, res)=>{
   console.log(req.session.shop)
   var shop = req.session.shop || {ShopName:'大帥西服'};
   userdb.GetDataBase('shop_info', shop,
-    ['History'],function(error,data){
+    ['History'], (error,data)=>{
         if(typeof data !== 'undefined'){
           for(i = 0; i < data[0].length; i++)
             result.push({paragraph:data[0][i]});
@@ -261,7 +304,7 @@ app.get('/venderHistory', (req, res)=>{
 app.get('/shopContact', (req, res)=>{
 var shop = req.session.shop || {ShopName:'大帥西服'};
 userdb.GetDataBase('shop_info', shop,
-  ['ShopName','OpenTime','Telphone','Address'],function(error,data){
+  ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
       if(typeof data != 'undefined'){
         res.render('shop_contact', {
           venderSel: true,
@@ -345,7 +388,11 @@ app.get('/suitHome', (req, res)=>{
     res.render('suit_home', {
       venderSel: false,
       suitSel: true,
-      bookSel: false
+      bookSel: false,
+      prev: {
+        href: '/',
+        title: 'beforeAfter'
+      }
     });
 });
 app.get('/suitCategory', (req, res)=>{
@@ -408,7 +455,11 @@ app.get('/login', (req, res)=>{
     res.render('login_page', {
       venderSel: false,
       suitSel: false,
-      bookSel: true
+      bookSel: true,
+      prev: {
+        href: '/',
+        title: 'beforeAfter'
+      }
     });
   }
 });
@@ -427,7 +478,17 @@ app.get('/register', function(req, res) {
     });
   }
 });
-
+app.get('/forget', function(req, res) {
+  res.render('forget', {
+    venderSel: false,
+    suitSel: false,
+    bookSel: true,
+    prev: {
+      href: '/login',
+      title: 'login'
+    }
+  });
+});
 app.get('/suitProcess', (req, res)=>{
   console.log('suitprocess');
   //if people have yet logined in, ask to login. 
@@ -458,7 +519,7 @@ app.get('/suitProcess', (req, res)=>{
           processList = "null";
         }
         res.render('suit_process', {
-          layout: 'mainafter',
+          layout: 'main_after',
           processSel: true,
           afterServiceSel: false,
           prev:{
@@ -483,7 +544,7 @@ app.get('/afterService', (req, res)=>{
       ['ShopName'],
       function(error, data){
         res.render('after_service', {
-          layout: 'mainafter',
+          layout: 'main_after',
           processSel: false,
           afterServiceSel: true,
           shopList: data[0],

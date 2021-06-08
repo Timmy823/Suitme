@@ -14,8 +14,8 @@ $(document).ready( function() {
         type: "POST" ,
         dataType: "json",
         data: sendData,
-        url: '/test/login',
-        success: function(data) {
+        url: '/login',
+        success: (data) => {
           console.log(data);
 
           if (data.succLogin) {
@@ -36,7 +36,7 @@ $(document).ready( function() {
 
           }
         },
-        error: function(error) {
+        error: (error) => {
           console.log("fail");
         }
       });
@@ -97,14 +97,14 @@ $(document).ready( function() {
     $.ajax({
       type:'POST',
       dataType:'json',
-      data:{
+      data: {
         Choice:choice
       },
-      url:'/test/login',
-        success:function(data){
+      url:'/login/',
+        success: (data)=>{
         console.log('send success!');
       },
-      error:function(data){
+      error:(data)=>{
         console.log('send error!');
       }
     });

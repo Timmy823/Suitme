@@ -4,7 +4,7 @@ $(function(){
   callValidate();
 
   function register() {
-    $.validator.addMethod("phoneNum", function(value, element) {
+    $.validator.addMethod("phoneNum", (value, element)=> {
       return this.optional(element) || /^\d{4}-\d{3}-\d{3}$/.test(value);
     }, 'Please enter valid phone number');
   }
@@ -120,6 +120,7 @@ $(document).ready(function(){
 
   // logout-box click event----------------
   $("div.logout-container div.logout-box").on("click", function(e) {
+    console.log("logout");
     e.preventDefault();
     e.stopPropagation();
                      

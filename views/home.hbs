@@ -30,7 +30,9 @@
       $.ajax({
         type:"POST",
         dataType:"json",
-        data:{Moment:choose},
+        data:{
+          Moment:choose
+        },
         url:'/beforeAfter',
         success:function(data){
           console.log("Success!");

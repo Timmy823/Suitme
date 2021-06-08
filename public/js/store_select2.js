@@ -243,12 +243,12 @@ $(function(){
       dataType: 'json',
       data: ShopObj,
       url: '/selectStore',
-      success: function(data) {
-        setTimeout(function() {
+      success: (data)=> {
+        setTimeout(() =>{
           document.location = data.redirectUrl;
         }, 500);
       },
-      error: function(error) {
+      error: (error)=> {
         console.log('error');
         console.log(error);
       }

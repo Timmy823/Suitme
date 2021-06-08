@@ -16,6 +16,8 @@
     "express": "^4.17.1",
     "express-handlebars": "^5.3.0",
     "express-session": "^1.17.1",
+    "fs": "^0.0.1-security",
+    "nodemailer": "^6.6.1",
     "redis": "^3.1.2"
   }
 }

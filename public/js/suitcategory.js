@@ -2,7 +2,6 @@ $(function(){
   $(".cat_opening").click(function(){
     $(".cat_opening").addClass("byebye");
     $(".category").removeClass("byebye");
-    $(".cat_opening").addClass("byebye");
     $.scrollify({
       section : ".category",
       // interstitialSection : ".category",
