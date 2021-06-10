@@ -13,8 +13,6 @@ const port = 5000
 var app = express();
 var redisClient = redis.createClient();
 
-
-
 /* setting hbs */
 /* layoutsDir and partialsDir is default setting*/
 app.engine('.hbs', exphbs({     
@@ -205,7 +203,7 @@ app.post('/register', (req, res)=>{
 });
 app.post('/forget', (req, res) =>{
   console.log(req.body);
-  userdb.GetDataBase('account',JSON.parse(req.body),['email','password'],
+  userdb.GetSheetData('account',JSON.parse(req.body),['email','password'],
     (err,reply) => {
       console.log(reply);
       if(typeof reply !== 'undefined'){
@@ -223,6 +221,17 @@ app.post('/forget', (req, res) =>{
       }
     }
   );
+});
+app.post('/regModify', (req, res) => {
+  console.log(req.session.user);
+  
+  userdb.UpdateSheetData('account', req.session.user, JSON.parse(JSON.stringify(req.body)), (err)=>{
+    req.session.user = JSON.parse(JSON.stringify(req.body));
+    res.status(200).send({
+      successUpdate: true,
+    });
+  });
+
 });
 /* GET home page. */
 app.get('/', (req, res)=>{
@@ -247,7 +256,7 @@ app.get('/venderHome', (req, res)=>{
   console.log(req.session);
   var shop = req.session.shop || {ShopName:'大帥西服'};
 
-  userdb.GetDataBase(
+  userdb.GetSheetData(
     'shop_info',
     shop,
     ['themeImg'],
@@ -279,7 +288,7 @@ app.get('/venderHistory', (req, res)=>{
   var result = [];
   console.log(req.session.shop)
   var shop = req.session.shop || {ShopName:'大帥西服'};
-  userdb.GetDataBase('shop_info', shop,
+  userdb.GetSheetData('shop_info', shop,
     ['History'], (error,data)=>{
         if(typeof data !== 'undefined'){
           for(i = 0; i < data[0].length; i++)
@@ -303,7 +312,7 @@ app.get('/venderHistory', (req, res)=>{
 });
 app.get('/shopContact', (req, res)=>{
 var shop = req.session.shop || {ShopName:'大帥西服'};
-userdb.GetDataBase('shop_info', shop,
+userdb.GetSheetData('shop_info', shop,
   ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
       if(typeof data != 'undefined'){
         res.render('shop_contact', {
@@ -329,8 +338,8 @@ app.get('/cloth', (req, res)=>{
   var result = [];
   var shop = req.session.shop || {ShopName:'大帥西服'};
   console.log(shop);
-  userdb.GetDataBase('shop_info', shop,
-    ['cloth'],function(error,data){
+  userdb.GetSheetData('shop_info', shop,
+    ['cloth'],(error,data)=>{
         if(typeof data !== 'undefined'){
           for(i = 0; i < data[0].length; i++) {
             result.push({imagine:data[0][i],index:(i+1).toString()});
@@ -355,8 +364,8 @@ app.get('/feedback', (req, res)=>{
   var result = [];
   var shop = req.session.shop || {ShopName:'大帥西服'};
 
-  userdb.GetDataBase('feedback', shop,
-  ['UserName','Time','Message','Evaluation'],function(error,data){
+  userdb.GetSheetData('feedback', shop,
+  ['UserName','Time','Message','Evaluation'],(error,data) => {
       if(typeof data !== 'undefined')  {
         for(i = 0; i < data[0].length; i++){
           //console.log('feedback: '+data);
@@ -430,7 +439,7 @@ app.get('/suitHistory', (req, res)=>{
   });
 });
 app.get('/bookHome', sessExist, (req, res)=>{
-  userdb.GetDataBase('shop_info','ALL',
+  userdb.GetSheetData('shop_info','ALL',
     ['ShopName'],
     function(error, data){
       console.log('data');
@@ -489,11 +498,29 @@ app.get('/forget', function(req, res) {
     }
   });
 });
+app.get('/regModify', sessExist, (req, res)=> {
+    res.render('regModify', {
+        venderSel: false,
+        suitSel: false,
+        bookSel: true,
+        userInfo: {
+          account: req.session.user.account,
+          nickname: req.session.user.nickname,
+          password: req.session.user.password,
+          cellphone: req.session.user.cellphone,
+          email: req.session.user.email
+        },
+        prev: {
+          href: '/bookhome',
+          title: 'bookhome'
+        }
+      });
+});
 app.get('/suitProcess', (req, res)=>{
   console.log('suitprocess');
   //if people have yet logined in, ask to login. 
   if (typeof req.session.user !== 'undefined') {
-    userdb.GetDataBase('custom',
+    userdb.GetSheetData('custom',
       {account: req.session.user.account},
       ['ShopName','SuitName', 'Process'],
       function(error, data) {
@@ -540,7 +567,7 @@ app.get('/afterService', (req, res)=>{
   console.log('afterservice');
   //if people have yet logined in, ask to login.
   if (typeof req.session.user !== 'undefined')  {
-    userdb.GetDataBase('shop_info', "ALL",
+    userdb.GetSheetData('shop_info', "ALL",
       ['ShopName'],
       function(error, data){
         res.render('after_service', {

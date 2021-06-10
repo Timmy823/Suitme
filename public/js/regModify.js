@@ -20,21 +20,22 @@ $(document).ready( function() {
 
   $("form#register-form").validate({
     debug: true,
-    submitHandler: function(form) {
+    submitHandler: (form) => {
 
-      var sendData = $("form#register-form").serializeObject();
+      var sendData = new Object();
+      sendData['account'] = $('input[name="account"]').val();
+      sendData =  Object.assign(sendData, $("form#register-form").serializeObject());
       delete sendData.password2;
       //for (var key in sendData) sendData[key] = "a" + sendData[key];
-
       console.log("start submit");
-
+      console.log(sendData)
       // disable orgin event behavior
       $.ajax({
         type: "POST" ,
         dataType: "json",
         data: sendData,
         url: '/regModify',
-        success: function(data) {
+        success: (data) => {
           if (data.successUpdate) {
             console.log(data);
             // if register successful , show popup info
@@ -42,9 +43,9 @@ $(document).ready( function() {
             $('div#register_succ_pop_up').bPopup({
               modalColor: '#333333',
               opacity: 0.6,
-              onClose: function(){
-                document.location = data.redirectUrl;
-              }
+              // onClose: ()=>{
+              //    console.log()
+              // }
             });
           } else {
             $("input[name=account]")

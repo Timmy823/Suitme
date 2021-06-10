@@ -1,8 +1,8 @@
 div.suit_knowledge {
-	background-image: url('../img/suithistory/suithistory_bg.jpg');
+  background-image: url('../img/suithistory/suithistory_bg.jpg');
   background-repeat: repeat-y;
   background-size: 100% auto;
-	padding-top:10%;
+  padding-top:10%;
 
   font-family: DFT !important;
 }
@@ -22,11 +22,6 @@ div.suit_history {
 	padding-bottom:10%;
 }
 
-p.history_time {
-	margin-left: 10%;
-	float:left;
-	margin-bottom:20%;
-}
 p.history_story {
 	margin-left: 21%;
 	margin-right: 10%;
