@@ -35,21 +35,28 @@ app.set('view engine', '.hbs');
 app.set('view cache', true);
 
 
+/* 
+  cookie :{
+    connect.sid : s:{sessionID}.{hmac-sha256(sessionID, secret)}
+  }
+  session middleware 
+*/
 app.use(session({
-    secret: 'helloworld something terrible and oh no',
+    secret: 'welcome suitme',
     store: new redisStore({
       client: redisClient,
-      ttl: 30*24*60*60
+      prefix: 'suitme',
+      ttl: 60*60
     }),
     saveUninitialized: false,
     resave: false
 }));
-// app.use(function (req, res, next) {
-//   if (!req.session) {
-//     return next(new Error('oh no')) // handle error
-//   }
-//   next() // otherwise continue
-// })
+app.use((req, res, next) =>{
+  if (!req.session) {
+    return next(new Error('oh no')) // handle error
+  }
+  next() // otherwise continue
+})
 app.use(express.static(__dirname + '/public'));
 
 //The express.json() and express.urlencoded() middleware have been added to provide request body parsing support.
@@ -98,7 +105,6 @@ app.post('/beforeAfter',(req, res) =>{
 //  such as restful api
 app.post('/selectStore', (req, res)=> {
   req.session.shop = JSON.parse(JSON.stringify(req.body));
-  console.log(req.session);
   res.status(200).send({
     redirectUrl: '/venderHome'
   });
@@ -110,7 +116,7 @@ app.post('/login',(req, res)=>{
   console.log(login);
   /* if haven't loged in */
   if((typeof Object.keys(login)[0] === 'string')&&(Object.keys(login)[0] == 'Choice')) {
-    req.session.afterMenu = req.body.Choice;
+    req.session.location = req.body.Choice;
     res.status(200).send({succLogin: false, redirectUrl: '/login'});
   }
   else {
@@ -126,7 +132,7 @@ app.post('/login',(req, res)=>{
           res.status(200).send({succLogin: true, redirectUrl: '/bookhome'});
         }
         else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog'))  {
-          if((typeof req.session.afterMenu === 'string')&&( req.session.afterMenu == 'service')) {
+          if((typeof req.session.location === 'string')&&( req.session.location == 'service')) {
             res.status(200).send({succLogin: true, redirectUrl: '/afterService'});
           }
           else{
@@ -225,11 +231,10 @@ app.post('/forget', (req, res) =>{
 app.post('/regModify', (req, res) => {
   console.log(req.session.user);
   
-  userdb.UpdateSheetData('account', req.session.user, JSON.parse(JSON.stringify(req.body)), (err)=>{
-    req.session.user = JSON.parse(JSON.stringify(req.body));
-    res.status(200).send({
+  userdb.UpdateSheetData('account', req.session.user, JSON.parse(JSON.stringify(req.body))); 
+  req.session.user = JSON.parse(JSON.stringify(req.body));
+  res.status(200).send({
       successUpdate: true,
-    });
   });
 
 });
@@ -238,6 +243,7 @@ app.get('/', (req, res)=>{
 	res.render('home', {layout: 'main_non_nav'});
 });
 app.get('/selectStore',(req,res)=>{
+  req.session.hour == 'beforelog';
   res.render('select_store', { 
     venderSel: true,
     suitSel: false,
@@ -253,7 +259,7 @@ app.get('/selectStore',(req,res)=>{
 app.get('/venderHome', (req, res)=>{
 
   console.log('venderhome');
-  console.log(req.session);
+  req.session.hour == 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
 
   userdb.GetSheetData(
@@ -282,11 +288,10 @@ app.get('/venderHome', (req, res)=>{
       }
     }
   );
-
 });
 app.get('/venderHistory', (req, res)=>{
   var result = [];
-  console.log(req.session.shop)
+  req.session.hour == 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
   userdb.GetSheetData('shop_info', shop,
     ['History'], (error,data)=>{
@@ -311,31 +316,33 @@ app.get('/venderHistory', (req, res)=>{
   );
 });
 app.get('/shopContact', (req, res)=>{
-var shop = req.session.shop || {ShopName:'大帥西服'};
-userdb.GetSheetData('shop_info', shop,
-  ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
-      if(typeof data != 'undefined'){
-        res.render('shop_contact', {
-          venderSel: true,
-          suitSel: false,
-          bookSel: false,
-          name:data[0][0],
-          time:data[1][0],
-          telphone:data[2][0],
-          address:data[3][0],
-          prev: {
-            href: '/venderHome',
-            title: 'venderHome'
-          }
-        });
+  req.session.hour == 'beforelog';
+  var shop = req.session.shop || {ShopName:'大帥西服'};
+  userdb.GetSheetData('shop_info', shop,
+    ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
+        if(typeof data != 'undefined'){
+          res.render('shop_contact', {
+            venderSel: true,
+            suitSel: false,
+            bookSel: false,
+            name:data[0][0],
+            time:data[1][0],
+            telphone:data[2][0],
+            address:data[3][0],
+            prev: {
+              href: '/venderHome',
+              title: 'venderHome'
+            }
+          });
+        }
+        else
+          console.log('error!!!');
       }
-      else
-        console.log('error!!!');
-    }
-);
+  );
 });
 app.get('/cloth', (req, res)=>{
   var result = [];
+  req.session.hour == 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
   console.log(shop);
   userdb.GetSheetData('shop_info', shop,
@@ -362,6 +369,7 @@ app.get('/cloth', (req, res)=>{
 });
 app.get('/feedback', (req, res)=>{
   var result = [];
+  req.session.hour == 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
 
   userdb.GetSheetData('feedback', shop,
@@ -394,6 +402,7 @@ app.get('/feedback', (req, res)=>{
 });
 // second page
 app.get('/suitHome', (req, res)=>{
+  req.session.hour == 'beforelog';
     res.render('suit_home', {
       venderSel: false,
       suitSel: true,
@@ -405,6 +414,7 @@ app.get('/suitHome', (req, res)=>{
     });
 });
 app.get('/suitCategory', (req, res)=>{
+  req.session.hour == 'beforelog';
   res.render('suit_category', {
     venderSel: false,
     suitSel: true,
@@ -416,6 +426,7 @@ app.get('/suitCategory', (req, res)=>{
   });
 });
 app.get('/suitInfo', (req, res)=>{
+  req.session.hour == 'beforelog';
   res.render('suit_info', {
     venderSel: false,
     suitSel: true,
@@ -428,6 +439,7 @@ app.get('/suitInfo', (req, res)=>{
 });
 
 app.get('/suitHistory', (req, res)=>{
+  req.session.hour == 'beforelog';
   res.render('suit_history', {
     venderSel: false,
     suitSel: true,
@@ -439,6 +451,7 @@ app.get('/suitHistory', (req, res)=>{
   });
 });
 app.get('/bookHome', sessExist, (req, res)=>{
+  req.session.hour == 'beforelog';
   userdb.GetSheetData('shop_info','ALL',
     ['ShopName'],
     function(error, data){
@@ -461,18 +474,44 @@ app.get('/login', (req, res)=>{
   if (typeof req.session.user !== 'undefined') {
     res.redirect(303,'/bookHome');
   } else{
-    res.render('login_page', {
-      venderSel: false,
-      suitSel: false,
-      bookSel: true,
-      prev: {
-        href: '/',
-        title: 'beforeAfter'
+    if((typeof req.session.hour === 'string') && (req.session.hour === 'beforelog')){
+      res.render('login_page', {
+        venderSel: false,
+        suitSel: false,
+        bookSel: true,
+        prev: {
+          href: '/',
+          title: 'beforeAfter'
+        }
+      });
+    }
+    else{
+      if((typeof req.session.location === 'string') && (req.session.location === 'processSel')){
+        res.render('login_page', {
+          layout: 'main_after',
+          processSel: true,
+          afterServiceSel: false,
+          prev: {
+            href: '/',
+            title: 'beforeAfter'
+          }
+        });
       }
-    });
+      else{
+        res.render('login_page', {
+          layout: 'main_after',
+          processSel: false,
+          afterServiceSel: true,
+          prev: {
+            href: '/',
+            title: 'beforeAfter'
+          }
+        });
+      }
+    }
   }
 });
-app.get('/register', function(req, res) {
+app.get('/register', (req, res)=>{
   if (typeof req.session.user !== 'undefined') {
     res.redirect(303,'/bookhome');
   } else {
@@ -487,7 +526,7 @@ app.get('/register', function(req, res) {
     });
   }
 });
-app.get('/forget', function(req, res) {
+app.get('/forget', (req, res)=>{
   res.render('forget', {
     venderSel: false,
     suitSel: false,
@@ -518,12 +557,14 @@ app.get('/regModify', sessExist, (req, res)=> {
 });
 app.get('/suitProcess', (req, res)=>{
   console.log('suitprocess');
+  req.session.hour == 'afterlog';
+  req.session.location = 'processSel';
   //if people have yet logined in, ask to login. 
   if (typeof req.session.user !== 'undefined') {
     userdb.GetSheetData('custom',
       {account: req.session.user.account},
       ['ShopName','SuitName', 'Process'],
-      function(error, data) {
+      (error, data)=>{
         var optionList = [],
           processList = "";
 
@@ -565,6 +606,8 @@ app.get('/suitProcess', (req, res)=>{
 });
 app.get('/afterService', (req, res)=>{
   console.log('afterservice');
+  req.session.hour == 'afterlog';
+  req.session.location = 'afterServiceSel';
   //if people have yet logined in, ask to login.
   if (typeof req.session.user !== 'undefined')  {
     userdb.GetSheetData('shop_info', "ALL",
@@ -590,12 +633,16 @@ app.get('/afterService', (req, res)=>{
 
 app.use((req, res, next) => {
     res.status(404);
-    res.render('404');
+    res.render('404',{
+      layout: 'main_non_nav'
+    });
 })
 app.use((err, req, res, next) => {
 	console.error(err.stack);
 	res.status(500);
-	res.render('500');
+	res.render('500',{
+    layout: 'main_non_nav'
+  });
 })
 // 在port聆聽request
 app.listen(port, () => {

@@ -1,19 +1,19 @@
 $(document).ready( function() {
 
   /* customized valiated method */
-  $.validator.addMethod("phoneNum", function(value, element) {
+  $.validator.addMethod("phoneNum", (value, element)=>{
     return this.optional(element) || /^\d{4}-\d{3}-\d{3}$/.test(value);
   }, 'Please enter valid phone number');
 
-  $.validator.addMethod('cjkenUsername', function(value, element) {
+  $.validator.addMethod('cjkenUsername', (value, element)=>{
     return this.optional(element) || /^(?=.{2,16})(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9\u4e00-\u9fff._-]+(?:[^_.-])$/.test(value);
   }, '2 to 16 chinese, japen, korean, and en character');
 
-  $.validator.addMethod('password', function(value, element) {
+  $.validator.addMethod('password', (value, element)=>{
     return this.optional(element) || /^(?=(?:.*[a-zA-Z]){2})(?=.*\d)[a-zA-Z0-9]{6,16}$/.test(value);
   }, 'at least 2 char, and total 8 to 16 char and num');
   
-  $.validator.addMethod('trimail', function(value, element) {
+  $.validator.addMethod('trimail', (value, element)=> {
     return this.optional(element) || /^((?:^\w+(?:[-+.']\w+)*@(?:gmail\.com|yahoo\.com|hotmail\.com)))$/.test(value);
   }, 'gmail.com or yahoo.com or hotmail.com');
   /*------------------------------*/
