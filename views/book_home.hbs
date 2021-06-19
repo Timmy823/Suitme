@@ -26,8 +26,10 @@
 
         <div class="column img-box">
           <div class="book-circular">
-            <img src="/img/user/user.png">
+            <input type="file" class="file" accept=".png, .jpg, .jpeg">
+            <img src="/img/user/{{user.photo}}">
           </div>
+          
         </div>
 
         <div class="column name-box">
@@ -47,11 +49,7 @@
 
         <div class="column select-box">
           <select form="book_form" name="time" class="select-styled">
-            <option value="" selected>選擇時間</option>
-            <option value="9" >9 am</option>
-            <option value="10" >10 am</option>
-            <option value="14" >2 pm</option>
-            <option value="15" >3 pm</option>
+            <option value="" selected="selected">選擇時間</option>
           </select>
           <div class="error-box">
             <label>*請選擇時間</label>
@@ -73,4 +71,15 @@
         </form>
     </div>
   </div>
+  <div id="photo_succ_pop_up">
+  <div class="main-photo-succ">
+    <p>修改成功</p>
+  </div>
+  <div class="content-photo-succ">
+    <p>修改已成功，請重新登入！</p>
+  </div>
+  <div class="image-photo-succ">
+    <img id="succ-icon" src="/img/login_page/refresh-36.png">
+  </div>
+</div>
 </div>

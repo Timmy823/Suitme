@@ -1,17 +1,27 @@
 //透過http模組啟動web server服務
 const http = require('http');
-var express = require('express');
-var exphbs = require('express-handlebars');
-var session = require('express-session');
-var redis = require('redis');
-var redisStore = require('connect-redis')(session);
+const express = require('express');
+const exphbs = require('express-handlebars');
+const session = require('express-session');
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);
+const multer  = require('multer');
 
-var userdb = require('./lib/userdb.js');
-var mail = require('./lib/mail.js');
+const userdb = require('./lib/userdb.js');
+const mail = require('./lib/mail.js');
 
 const port = 5000
-var app = express();
-var redisClient = redis.createClient();
+const app = express();
+const redisClient = redis.createClient();
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, __dirname + '/public/img/user')      //you tell where to upload the files,
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+let upload = multer({storage: storage});
 
 /* setting hbs */
 /* layoutsDir and partialsDir is default setting*/
@@ -73,7 +83,6 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
 function sessExist(req, res, next) {
   if(typeof req.session.user === 'undefined') {
     res.redirect(303, '/login');
@@ -112,7 +121,7 @@ app.post('/selectStore', (req, res)=> {
 
 /* login restful api */
 app.post('/login',(req, res)=>{
-  var login = JSON.parse(JSON.stringify(req.body));
+  let login = JSON.parse(JSON.stringify(req.body));
   console.log(login);
   /* if haven't loged in */
   if((typeof Object.keys(login)[0] === 'string')&&(Object.keys(login)[0] == 'Choice')) {
@@ -129,7 +138,7 @@ app.post('/login',(req, res)=>{
       if ( typeof data !== 'undefined' ) {
         req.session.user = data;
         if((typeof req.session.hour === 'string')&&(req.session.hour == 'beforelog')) {
-          res.status(200).send({succLogin: true, redirectUrl: '/bookhome'});
+          res.status(200).send({succLogin: true, redirectUrl: '/bookHome'});
         }
         else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog'))  {
           if((typeof req.session.location === 'string')&&( req.session.location == 'service')) {
@@ -140,7 +149,7 @@ app.post('/login',(req, res)=>{
           }
         }
         else {
-          res.status(200).send({succLogin: true, redirectUrl: '/bookhome'});
+          res.status(200).send({succLogin: true, redirectUrl: '/bookHome'});
         }
       // else, login faill, redirect to /login_page
       } else {
@@ -152,12 +161,11 @@ app.post('/login',(req, res)=>{
 
 app.post('/logout', (req, res) =>{
   if (req.session.user) {
-    req.session.destroy(()=>{
-      res.status(200).send({
+    delete req.session.user;
+    res.status(200).send({
         redirectUrl: '/login'
-      });
-
     });
+
   } else {
     res.status(200).send({
       redirectUrl: '/login'
@@ -188,7 +196,8 @@ app.post('/register', (req, res)=>{
      * insert new account info to db
      ******************************************/
     if(typeof reply === 'undefined') {
-      userdb.AddSheetData('account', req.body);
+      let userobj = Object.assign(req.body,{photo:"user.png"})
+      userdb.AddSheetData('account', userobj);
       res.status(200).send({
         accountDup: false,
         redirectUrl: '/login'
@@ -228,22 +237,50 @@ app.post('/forget', (req, res) =>{
     }
   );
 });
-app.post('/regModify', (req, res) => {
+app.post('/bookHome', (req, res)=>{
+  var _input = {
+    Time: (new Date()).toString(),
+    UserName: req.session.user.account || 'error',
+    Shop: req.body.shop,
+    ReserveTime: req.body.reserv_time
+  };
+
+  console.log(_input);
+  userdb.AddSheetData('reservation', _input);
+  res.status(200).send({
+    success: true,
+    redirectUrl: '/bookHome'
+  });
+});
+app.put('/bookHome', upload.single('file'),  (req, res) => {
+  console.log(req.file);
+  let userobj = {
+    account: req.session.user.account,
+    nickname: req.session.user.nickname,
+    password: req.session.user.password,
+    cellphone: req.session.user.cellphone,
+    email: req.session.user.email,
+    photo: req.file.filename
+  }
+  userdb.UpdateSheetData('account', req.session.user, userobj); 
+  delete req.session.user;
+  res.status(200).send({
+    redirectUrl: '/login'
+  });
+});
+app.put('/regModify', (req, res) => {
   console.log(req.session.user);
   
   userdb.UpdateSheetData('account', req.session.user, JSON.parse(JSON.stringify(req.body))); 
   req.session.user = JSON.parse(JSON.stringify(req.body));
-  res.status(200).send({
-      successUpdate: true,
-  });
-
+  res.status(200);
 });
 /* GET home page. */
 app.get('/', (req, res)=>{
 	res.render('home', {layout: 'main_non_nav'});
 });
 app.get('/selectStore',(req,res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
   res.render('select_store', { 
     venderSel: true,
     suitSel: false,
@@ -259,8 +296,8 @@ app.get('/selectStore',(req,res)=>{
 app.get('/venderHome', (req, res)=>{
 
   console.log('venderhome');
-  req.session.hour == 'beforelog';
-  var shop = req.session.shop || {ShopName:'大帥西服'};
+  req.session.hour = 'beforelog';
+  let shop = req.session.shop || {ShopName:'大帥西服'};
 
   userdb.GetSheetData(
     'shop_info',
@@ -290,9 +327,9 @@ app.get('/venderHome', (req, res)=>{
   );
 });
 app.get('/venderHistory', (req, res)=>{
-  var result = [];
-  req.session.hour == 'beforelog';
-  var shop = req.session.shop || {ShopName:'大帥西服'};
+  let result = [];
+  req.session.hour = 'beforelog';
+  let shop = req.session.shop || {ShopName:'大帥西服'};
   userdb.GetSheetData('shop_info', shop,
     ['History'], (error,data)=>{
         if(typeof data !== 'undefined'){
@@ -316,7 +353,7 @@ app.get('/venderHistory', (req, res)=>{
   );
 });
 app.get('/shopContact', (req, res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
   userdb.GetSheetData('shop_info', shop,
     ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
@@ -341,8 +378,8 @@ app.get('/shopContact', (req, res)=>{
   );
 });
 app.get('/cloth', (req, res)=>{
-  var result = [];
-  req.session.hour == 'beforelog';
+  let result = [];
+  req.session.hour = 'beforelog';
   var shop = req.session.shop || {ShopName:'大帥西服'};
   console.log(shop);
   userdb.GetSheetData('shop_info', shop,
@@ -368,9 +405,9 @@ app.get('/cloth', (req, res)=>{
   );
 });
 app.get('/feedback', (req, res)=>{
-  var result = [];
-  req.session.hour == 'beforelog';
-  var shop = req.session.shop || {ShopName:'大帥西服'};
+  let result = [];
+  req.session.hour = 'beforelog';
+  const shop = req.session.shop || {ShopName:'大帥西服'};
 
   userdb.GetSheetData('feedback', shop,
   ['UserName','Time','Message','Evaluation'],(error,data) => {
@@ -402,7 +439,7 @@ app.get('/feedback', (req, res)=>{
 });
 // second page
 app.get('/suitHome', (req, res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
     res.render('suit_home', {
       venderSel: false,
       suitSel: true,
@@ -414,7 +451,7 @@ app.get('/suitHome', (req, res)=>{
     });
 });
 app.get('/suitCategory', (req, res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
   res.render('suit_category', {
     venderSel: false,
     suitSel: true,
@@ -426,7 +463,7 @@ app.get('/suitCategory', (req, res)=>{
   });
 });
 app.get('/suitInfo', (req, res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
   res.render('suit_info', {
     venderSel: false,
     suitSel: true,
@@ -439,7 +476,7 @@ app.get('/suitInfo', (req, res)=>{
 });
 
 app.get('/suitHistory', (req, res)=>{
-  req.session.hour == 'beforelog';
+  req.session.hour = 'beforelog';
   res.render('suit_history', {
     venderSel: false,
     suitSel: true,
@@ -451,12 +488,10 @@ app.get('/suitHistory', (req, res)=>{
   });
 });
 app.get('/bookHome', sessExist, (req, res)=>{
-  req.session.hour == 'beforelog';
-  userdb.GetSheetData('shop_info','ALL',
-    ['ShopName'],
-    function(error, data){
-      console.log('data');
-      console.log(data[0]);
+  req.session.hour = 'beforelog';
+  if(Object.keys(req.query).length === 0){
+    userdb.GetSheetData('shop_info','ALL',['ShopName'],(error, data)=>{
+      console.log(data);
       res.render('book_home', {
         venderSel: false,
         suitSel: false,
@@ -464,13 +499,23 @@ app.get('/bookHome', sessExist, (req, res)=>{
         shopList: data[0],
         user: {
           name: req.session.user.nickname,
-          phone: req.session.user.cellphone
+          phone: req.session.user.cellphone,
+          photo: req.session.user.photo
         }
       });
-    }
-  );
+    });
+  }
+  else{
+    userdb.GetSheetData('shop_info',{ShopName: req.query.shop_id},['bookTime'],(error, data)=>{
+      console.log(data);
+      res.status(200).send({
+        reply: data[0] 
+      });
+    });
+  }
 });
 app.get('/login', (req, res)=>{
+  console.log(req.session.hour);
   if (typeof req.session.user !== 'undefined') {
     res.redirect(303,'/bookHome');
   } else{
@@ -513,7 +558,7 @@ app.get('/login', (req, res)=>{
 });
 app.get('/register', (req, res)=>{
   if (typeof req.session.user !== 'undefined') {
-    res.redirect(303,'/bookhome');
+    res.redirect(303,'/bookHome');
   } else {
     res.render('register',{
       venderSel: false,
@@ -550,14 +595,14 @@ app.get('/regModify', sessExist, (req, res)=> {
           email: req.session.user.email
         },
         prev: {
-          href: '/bookhome',
-          title: 'bookhome'
+          href: '/bookHome',
+          title: 'bookHome'
         }
       });
 });
 app.get('/suitProcess', (req, res)=>{
   console.log('suitprocess');
-  req.session.hour == 'afterlog';
+  req.session.hour = 'afterlog';
   req.session.location = 'processSel';
   //if people have yet logined in, ask to login. 
   if (typeof req.session.user !== 'undefined') {
@@ -606,13 +651,12 @@ app.get('/suitProcess', (req, res)=>{
 });
 app.get('/afterService', (req, res)=>{
   console.log('afterservice');
-  req.session.hour == 'afterlog';
+  req.session.hour = 'afterlog';
   req.session.location = 'afterServiceSel';
   //if people have yet logined in, ask to login.
   if (typeof req.session.user !== 'undefined')  {
     userdb.GetSheetData('shop_info', "ALL",
-      ['ShopName'],
-      function(error, data){
+      ['ShopName'],(error, data)=>{
         res.render('after_service', {
           layout: 'main_after',
           processSel: false,

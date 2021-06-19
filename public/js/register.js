@@ -2,6 +2,7 @@ $(document).ready( function() {
 
   /* customized valiated method */
   $.validator.addMethod("phoneNum", function(value, element) {
+    console.log(this);
     return this.optional(element) || /^\d{4}-\d{3}-\d{3}$/.test(value);
   }, 'Please enter valid phone number');
 

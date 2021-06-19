@@ -2,15 +2,13 @@ $(function(){
 
   register();
   callValidate();
-
   function register() {
-    $.validator.addMethod("phoneNum", (value, element)=> {
+    $.validator.addMethod("phoneNum", function(value, element) {
       return this.optional(element) || /^\d{4}-\d{3}-\d{3}$/.test(value);
     }, 'Please enter valid phone number');
   }
-
   function callValidate() {
-    console.log('testes');
+    console.log('validating');
     $('form#book_form').validate({
       debug: true,
       submitHandler: myhander,
@@ -57,7 +55,7 @@ $(function(){
           .find('label')
           .css({color:'rgba(0,51,51,1)'});
       },
-      unhighlight: function(element, errorClass) {
+      unhighlight: (element, errorClass)=>{
         $(element).removeClass('error-input')
           .next('div.error-box')
           .find('label')
@@ -91,8 +89,8 @@ $(function(){
       type: "POST",
       dataType: "json",
       data: _sendData,
-      url:  '/book',
-      success: function(data) {
+      url:  '/bookHome',
+      success: (data) => {
         $('input[type=submit]').animate({
           textIndex: 100
         },{
@@ -116,8 +114,7 @@ $(function(){
 
 });
 
-$(document).ready(function(){
-
+$(document).ready(()=>{
   // logout-box click event----------------
   $("div.logout-container div.logout-box").on("click", function(e) {
     console.log("logout");
@@ -140,30 +137,63 @@ $(document).ready(function(){
 
   // render book time by ajax data--------------
   $("select[name=shop]").change(function(){
-
-    var _send = {
+    let _send = {
       shop_id: $(this).val()
     };
 
     $.ajax({
-      type: "POST",
+      type: "GET",
       dataType: "json",
       data: _send,
-      url: '/render/booktime',
-      success: function(data) {
+      url: '/bookHome',
+      success: (data)=>{
 
-        var option_data = data.map(function(e) {
+        var option_data = data.reply.map(function(e) {
           return $("<option value='"+e+"'>"+e+"</option>");
         });
 
         $("select[name=time] option:not([value=''])").remove("option");
         $("select[name=time]").append(option_data);
       },
-      error: function(error) {
+      error: (error)=>{
         console.log(error);
       }
     });
   });
-  //-------------------------------------------
+});
+$(document).ready(()=>{
+  // $('.book-circular > img').hover(()=>{
+  //   $('.book-circular > input').css("display","");
+  // });
+    $('.book-circular > input').change(function(e){
+      console.log("click");
+      console.log(e.target);
+      let image = e.target.files[0];
+      let filename = $('.name-box').find('h2').text() + "." + (image.name).split(".")[1];
+      const formdata = new FormData();
+      formdata.append('file', image, filename);
+  
+      $.ajax({
+        type: 'PUT',
+        processData: false,
+        contentType: false,
+        data: formdata,
+        url: '/bookHome',
+        success: (data)=>{
+          console.log("photo update");
+          $('div#photo_succ_pop_up').bPopup({
+            modalColor: '#333333',
+            opacity: 0.6,
+            onClose: function(){
+              document.location = data.redirectUrl;
+            }
+          });
+        },
+        error: (error)=>{
+          console.log(error);
+        }
+      });
+    });
+ 
 
 });

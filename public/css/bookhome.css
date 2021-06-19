@@ -103,6 +103,16 @@
     margin-left: -8px;
     margin-top: -10px;
   }
+  .file {
+    position: absolute;
+    opacity: 0;
+    display: block;
+    width: 180px;
+    height: 180px;
+    margin-left: -8px;
+    margin-top: -10px;
+    z-index: 2;
+  }
 
   div.select-box {
     padding-top: 0rem!important;
@@ -179,7 +189,6 @@
 
   div.book-btn-box input[type="submit"] {
     background: rgba(0, 51, 51, 0.5);
-    textIndex: 0;
     border: 1.5px none rgb(0, 51, 51);
     border-radius: 2px;
 
@@ -204,4 +213,37 @@
   div.error-box label {
     font-size: 1rem;
   }
+/**----bpop up content-----**/
+div#photo_succ_pop_up {
+  display: none;
+  
+  min-height: 150px;
+  min-width: 280px;
 
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  text-align: center;
+
+  pointer-events: none;
+}
+
+div#photo_succ_pop_up div.main-photo-succ {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+div#photo_succ_pop_up div.main-photo-succ p {
+  font-size: 35px;
+}
+
+div#photo_succ_pop_up div.content-photo-succ {
+  padding-bottom: 25px;
+}
+
+div#photo_succ_pop_up div.content-photo-succ p {
+  font-size: 20px;
+}
+
+div#photo_succ_pop_up div.image-photo-succ img {
+  height: 40px;
+}
