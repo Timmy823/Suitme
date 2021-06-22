@@ -8,10 +8,10 @@
   </div>
 </div>
 <div class="loginout">
-  <a>
+  <a href="/selectStore">
 		<div class="beforelog"></div>
 	</a>
-	<a>
+	<a href="/suitProcess">
 		<div class="afterlog"></div>
 	</a>
 </div>
@@ -23,28 +23,6 @@
         $(this).removeClass('animated ' + animationName);
       });
     }
-  });
-  $(document).ready(function(){
-    $('.loginout a').on("click",function(event){
-      var choose = $(this).find('div').attr('class');
-      $.ajax({
-        type:"POST",
-        dataType:"json",
-        data:{
-          Moment:choose
-        },
-        url:'/beforeAfter',
-        success:function(data){
-          console.log("Success!");
-          document.location = data.redirectUrl;
-        },
-        error:function(XMLHttpRequest, textStatus, errorThrown){
-          alert(XMLHttpRequest.status);
-          alert(XMLHttpRequest.readyState);
-          alert(textStatus);
-        }
-      });
-    });
   });
   $(document).ready(function(){
     /* binding click event for enter page */

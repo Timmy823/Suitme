@@ -92,28 +92,13 @@ function sessExist(req, res, next) {
 };
 
 //------------post--api---------------
-//The choice of before_reservation and after_reservation
-app.post('/beforeAfter',(req, res) =>{
-  req.session.hour = req.body.Moment; //record the choose of that
-  if((typeof req.session.hour === 'string')&&(req.session.hour == 'beforelog'))  {
-    res.status(200).send({
-      redirectUrl: '/selectStore'
-    });
-  }
-  else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog')) {
-    res.status(200).send({
-      redirectUrl: '/suitProcess'
-    });
-  }
-  else{ 
-    res.status(200).send({
-      redirectUrl: '/selectStore'
-    });
-  }
-});
 //  such as restful api
 app.post('/selectStore', (req, res)=> {
-  req.session.shop = JSON.parse(JSON.stringify(req.body));
+  const selectedstore = JSON.parse(JSON.stringify(req.body));
+  if(selectedstore.ShopName !== req.session.shop.ShopName){
+    delete req.session.shop;
+    req.session.shop = selectedstore;
+  }
   res.status(200).send({
     redirectUrl: '/venderHome'
   });
@@ -277,11 +262,12 @@ app.put('/regModify', (req, res) => {
 });
 /* GET home page. */
 app.get('/', (req, res)=>{
+  console.log(req.session);
 	res.render('home', {layout: 'main_non_nav'});
 });
 app.get('/selectStore',(req,res)=>{
   req.session.hour = 'beforelog';
-  res.render('select_store', { 
+  res.render('select_store', {
     venderSel: true,
     suitSel: false,
     bookSel: false,
@@ -294,47 +280,85 @@ app.get('/selectStore',(req,res)=>{
 
 //first page
 app.get('/venderHome', (req, res)=>{
-
   console.log('venderhome');
   req.session.hour = 'beforelog';
-  let shop = req.session.shop || {ShopName:'大帥西服'};
+  if(typeof req.session.shop === 'undefined'){
+    res.redirect(303, '/selectStore');
+  }
 
-  userdb.GetSheetData(
-    'shop_info',
-    shop,
-    ['themeImg'],
-    (error, data) =>{
-      if (typeof data !== 'undefined' && data[0] instanceof Array) {
-        console.log(data[0]);
-
-        res.render('vender_home', {
-          venderSel: true,
-          suitSel: false,
-          bookSel: false,
-          themeImg: {
-            left_up: data[0][0],
-            right_up: data[0][1],
-            right_mid: data[0][2],
-            bottom: data[0][3]
-          },
-          prev: {
-            href: '/',
-            title: 'beforeAfter'
-          }
-        });
+  const shop = req.session.shop || {ShopName:'大帥西服'};
+  if(typeof req.session.shop.themeImg !== 'undefined' && req.session.shop.themeImg instanceof Array){
+    res.render('vender_home', {
+      venderSel: true,
+      suitSel: false,
+      bookSel: false,
+      themeImg: {
+        left_up: req.session.shop.themeImg[0],
+        right_up: req.session.shop.themeImg[1],
+        right_mid: req.session.shop.themeImg[2],
+        bottom: req.session.shop.themeImg[3]
+      },
+      prev: {
+        href: '/selectStore',
+        title: 'selectStore'
       }
-    }
-  );
+    });
+  }
+  else{
+    userdb.GetSheetData(
+      'shop_info',
+      {ShopName: shop.ShopName},
+      ['themeImg'],
+      (error, data) =>{
+        if (typeof data !== 'undefined' && data[0] instanceof Array) {
+          console.log(data[0]);
+          req.session.shop.themeImg = data[0];
+          res.render('vender_home', {
+            venderSel: true,
+            suitSel: false,
+            bookSel: false,
+            themeImg: {
+              left_up: data[0][0],
+              right_up: data[0][1],
+              right_mid: data[0][2],
+              bottom: data[0][3]
+            },
+            prev: {
+              href: '/selectStore',
+              title: 'selectStore'
+            }
+          });
+        }
+      });
+  }
 });
 app.get('/venderHistory', (req, res)=>{
-  let result = [];
+  let result = new Array();
   req.session.hour = 'beforelog';
-  let shop = req.session.shop || {ShopName:'大帥西服'};
-  userdb.GetSheetData('shop_info', shop,
+  const shop = req.session.shop || {ShopName:'大帥西服'};
+
+  if(typeof req.session.shop.history !== 'undefined' && req.session.shop.history instanceof Array){
+    for(let i = 0; i < req.session.shop.history.length; i++)
+        result.push({paragraph:req.session.shop.history[i]});
+    res.render('vender_history', {
+      venderSel: true,
+      suitSel: false,
+      bookSel: false,
+      shop_name: shop.ShopName,
+      story: result,
+      prev: {
+        href: '/venderHome',
+        title: 'venderHome'
+      }
+    });
+  }
+  else{
+    userdb.GetSheetData('shop_info', {ShopName: shop.ShopName},
     ['History'], (error,data)=>{
         if(typeof data !== 'undefined'){
+          req.session.shop.history = data[0];
           for(i = 0; i < data[0].length; i++)
-            result.push({paragraph:data[0][i]});
+              result.push({paragraph:data[0][i]});
           res.render('vender_history', {
             venderSel: true,
             suitSel: false,
@@ -349,15 +373,36 @@ app.get('/venderHistory', (req, res)=>{
         }
         else
           console.log('error!!!');
-      }
-  );
+    });
+  }
 });
 app.get('/shopContact', (req, res)=>{
+  let info = new Array();
   req.session.hour = 'beforelog';
-  var shop = req.session.shop || {ShopName:'大帥西服'};
-  userdb.GetSheetData('shop_info', shop,
+  const shop = req.session.shop || {ShopName:'大帥西服'};
+  if(typeof req.session.shop.contact !== 'undefined' && req.session.shop.contact instanceof Array){
+    res.render('shop_contact', {
+      venderSel: true,
+      suitSel: false,
+      bookSel: false,
+      name:req.session.shop.contact[0],
+      time:req.session.shop.contact[1],
+      telphone:req.session.shop.contact[2],
+      address:req.session.shop.contact[3],
+      prev: {
+        href: '/venderHome',
+        title: 'venderHome'
+      }
+    });
+  }
+  else{
+    userdb.GetSheetData('shop_info', {ShopName: shop.ShopName},
     ['ShopName','OpenTime','Telphone','Address'],(error,data)=>{
         if(typeof data != 'undefined'){
+          for(let i = 0; i < 4; i++){
+            info.push(data[i][0]);
+          }
+          req.session.shop.contact = info;
           res.render('shop_contact', {
             venderSel: true,
             suitSel: false,
@@ -374,18 +419,35 @@ app.get('/shopContact', (req, res)=>{
         }
         else
           console.log('error!!!');
-      }
-  );
+    });
+  }
+
 });
 app.get('/cloth', (req, res)=>{
-  let result = [];
+  let result = new Array();
   req.session.hour = 'beforelog';
-  var shop = req.session.shop || {ShopName:'大帥西服'};
-  console.log(shop);
-  userdb.GetSheetData('shop_info', shop,
+  const shop = req.session.shop || {ShopName:'大帥西服'};
+  if(typeof req.session.shop.cloth !== 'undefined' && req.session.shop.cloth instanceof Array){
+    for(let i = 0; i < req.session.shop.cloth.length; i++) {
+      result.push({imagine:req.session.shop.cloth[i],index:(i+1).toString()});
+    }
+    res.render('cloth', {
+      venderSel: true,
+      suitSel: false,
+      bookSel: false,
+      clothList: result,
+      prev: {
+        href: '/venderHome',
+        title: 'venderHome'
+      }
+    });
+  }
+  else{
+    userdb.GetSheetData('shop_info', {ShopName: shop.ShopName},
     ['cloth'],(error,data)=>{
         if(typeof data !== 'undefined'){
-          for(i = 0; i < data[0].length; i++) {
+          req.session.shop.cloth = data[0];
+          for(let i = 0; i < data[0].length; i++) {
             result.push({imagine:data[0][i],index:(i+1).toString()});
           }
           res.render('cloth', {
@@ -401,15 +463,16 @@ app.get('/cloth', (req, res)=>{
         }
         else
           console.log('error!!!');
-    }
-  );
+    });
+  }
+
 });
 app.get('/feedback', (req, res)=>{
   let result = [];
   req.session.hour = 'beforelog';
   const shop = req.session.shop || {ShopName:'大帥西服'};
 
-  userdb.GetSheetData('feedback', shop,
+  userdb.GetSheetData('feedback', {ShopName: shop.ShopName},
   ['UserName','Time','Message','Evaluation'],(error,data) => {
       if(typeof data !== 'undefined')  {
         for(i = 0; i < data[0].length; i++){

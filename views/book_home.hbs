@@ -1,16 +1,11 @@
 <!DOCTYPE html>
 <link rel="stylesheet" type="text/css" href="/css/bookhome.css"></link>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
-<script src="/js/bookhome.js"></script>
 
 <div class="ui grid book-box">
   <div class="row link-row">
     <div class="left floated left aligned eight wide column modify-container">
       <div class="modify-box">
-        <a href="/regModify">
-          資料更改
-        </a>
+        <a href="/regModify">資料更改</a>
       </div>
     </div>
     <div class="right floated right aligned eight wide column logout-container">
@@ -21,15 +16,13 @@
   </div>
   <div class="row bookcontent-row">
     <div class="fourteen wide column centered">
-        <form id="book_form" action="/" method="post">
-      <div class="ui grid one column">
-
-        <div class="column img-box">
-          <div class="book-circular">
-            <input type="file" class="file" accept=".png, .jpg, .jpeg">
-            <img src="/img/user/{{user.photo}}">
-          </div>
-          
+      <form id="book_form" action="/" method="post">
+        <div class="ui grid one column">
+          <div class="column img-box">
+            <div class="book-circular">
+              <input type="file" class="file" accept=".png, .jpg, .jpeg">
+              <img src="/img/user/{{user.photo}}">
+            </div>  
         </div>
 
         <div class="column name-box">
@@ -66,20 +59,21 @@
         <div class="column book-btn-box">
           <input type="submit" class="uppercase" name="book-button" form="book_form" value="預約時間">
         </div>
-        
-      </div>
-        </form>
+      </form>
     </div>
   </div>
   <div id="photo_succ_pop_up">
-  <div class="main-photo-succ">
-    <p>修改成功</p>
+    <div class="main-photo-succ">
+      <p>修改成功</p>
+    </div>
+    <div class="content-photo-succ">
+      <p>修改已成功，請重新登入！</p>
+    </div>
+    <div class="image-photo-succ">
+      <img id="succ-icon" src="/img/login_page/refresh-36.png">
+    </div>
   </div>
-  <div class="content-photo-succ">
-    <p>修改已成功，請重新登入！</p>
-  </div>
-  <div class="image-photo-succ">
-    <img id="succ-icon" src="/img/login_page/refresh-36.png">
-  </div>
-</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-serialize-object/2.5.0/jquery.serialize-object.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+  <script src="/js/bookhome.js"></script>
 </div>
