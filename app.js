@@ -95,7 +95,11 @@ function sessExist(req, res, next) {
 //  such as restful api
 app.post('/selectStore', (req, res)=> {
   const selectedstore = JSON.parse(JSON.stringify(req.body));
-  if(selectedstore.ShopName !== req.session.shop.ShopName){
+
+  if(typeof req.session.shop === 'undefined'){
+    req.session.shop = selectedstore;
+  }
+  else if(selectedstore.ShopName !== req.session.shop.ShopName){
     delete req.session.shop;
     req.session.shop = selectedstore;
   }
