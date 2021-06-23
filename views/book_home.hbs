@@ -20,7 +20,7 @@
         <div class="ui grid one column">
           <div class="column img-box">
             <div class="book-circular">
-              <input type="file" class="file" accept=".png, .jpg, .jpeg">
+              <input type="file" class="file" accept=".png, .jpg, .jpeg" name="photo">
               <img src="/img/user/{{user.photo}}">
             </div>  
         </div>
@@ -41,11 +41,19 @@
         </div>
 
         <div class="column select-box">
-          <select form="book_form" name="time" class="select-styled">
-            <option value="" selected="selected">選擇時間</option>
+          <select form="book_form" name="types" class="select-styled">
+            <option value="" selected="selected">選擇種類</option>
           </select>
           <div class="error-box">
-            <label>*請選擇時間</label>
+            <label>*請選擇種類</label>
+          </div>
+        </div>
+        <div class="column select-box">
+          <select form="book_form" name="cloth" class="select-styled">
+            <option value="" selected="selected">選擇布料</option>
+          </select>
+          <div class="error-box">
+            <label>*請選擇布料</label>
           </div>
         </div>
 

@@ -227,15 +227,17 @@ app.post('/forget', (req, res) =>{
   );
 });
 app.post('/bookHome', (req, res)=>{
-  var _input = {
-    Time: (new Date()).toString(),
-    UserName: req.session.user.account || 'error',
-    Shop: req.body.shop,
-    ReserveTime: req.body.reserv_time
+  const _input = {
+    account: req.session.user.account || 'error',
+    ShopName: req.body.shop,
+    SuitName: req.body.types,
+    Style: req.body.cloth,
+    Process: '-0-',
+    Time: (new Date()).toString()
   };
 
   console.log(_input);
-  userdb.AddSheetData('reservation', _input);
+  userdb.AddSheetData('custom', _input);
   res.status(200).send({
     success: true,
     redirectUrl: '/bookHome'
@@ -277,7 +279,7 @@ app.get('/selectStore',(req,res)=>{
     bookSel: false,
     prev: {
       href: '/',
-      title: 'beforeAfter'
+      title: '回上一頁'
     }
   });
 });
@@ -304,7 +306,7 @@ app.get('/venderHome', (req, res)=>{
       },
       prev: {
         href: '/selectStore',
-        title: 'selectStore'
+        title: '回上一頁'
       }
     });
   }
@@ -329,7 +331,7 @@ app.get('/venderHome', (req, res)=>{
             },
             prev: {
               href: '/selectStore',
-              title: 'selectStore'
+              title: '回上一頁'
             }
           });
         }
@@ -352,7 +354,7 @@ app.get('/venderHistory', (req, res)=>{
       story: result,
       prev: {
         href: '/venderHome',
-        title: 'venderHome'
+        title: '回上一頁'
       }
     });
   }
@@ -371,7 +373,7 @@ app.get('/venderHistory', (req, res)=>{
             story: result,
             prev: {
               href: '/venderHome',
-              title: 'venderHome'
+              title: '回上一頁'
             }
           });
         }
@@ -395,7 +397,7 @@ app.get('/shopContact', (req, res)=>{
       address:req.session.shop.contact[3],
       prev: {
         href: '/venderHome',
-        title: 'venderHome'
+        title: '回上一頁'
       }
     });
   }
@@ -417,7 +419,7 @@ app.get('/shopContact', (req, res)=>{
             address:data[3][0],
             prev: {
               href: '/venderHome',
-              title: 'venderHome'
+              title: '回上一頁'
             }
           });
         }
@@ -442,7 +444,7 @@ app.get('/cloth', (req, res)=>{
       clothList: result,
       prev: {
         href: '/venderHome',
-        title: 'venderHome'
+        title: '回上一頁'
       }
     });
   }
@@ -472,7 +474,7 @@ app.get('/cloth', (req, res)=>{
 
 });
 app.get('/feedback', (req, res)=>{
-  let result = [];
+  let result = new Array();
   req.session.hour = 'beforelog';
   const shop = req.session.shop || {ShopName:'大帥西服'};
 
@@ -513,7 +515,7 @@ app.get('/suitHome', (req, res)=>{
       bookSel: false,
       prev: {
         href: '/',
-        title: 'beforeAfter'
+        title: '回上一頁'
       }
     });
 });
@@ -525,7 +527,7 @@ app.get('/suitCategory', (req, res)=>{
     bookSel: false,
     prev: {
       href: '/suitHome',
-      title: 'suitHome'
+      title: '回上一頁'
     }
   });
 });
@@ -537,7 +539,7 @@ app.get('/suitInfo', (req, res)=>{
     bookSel: false,
     prev: {
       href: '/suitHome',
-      title: 'suitHome'
+      title: '回上一頁'
     }
   });
 });
@@ -550,33 +552,56 @@ app.get('/suitHistory', (req, res)=>{
     bookSel: false,
     prev: {
       href: '/suitHome',
-      title: 'suitHome'
+      title: '回上一頁'
     }
   });
 });
 app.get('/bookHome', sessExist, (req, res)=>{
   req.session.hour = 'beforelog';
   if(Object.keys(req.query).length === 0){
-    userdb.GetSheetData('shop_info','ALL',['ShopName'],(error, data)=>{
-      console.log(data);
+    if(typeof req.session.shopList !== 'undefined'){
       res.render('book_home', {
         venderSel: false,
         suitSel: false,
         bookSel: true,
-        shopList: data[0],
+        shopList: req.session.shopList,
         user: {
           name: req.session.user.nickname,
           phone: req.session.user.cellphone,
           photo: req.session.user.photo
+        },
+        prev: {
+          href: '/suitProcess',
+          title: '查看訂單'
         }
       });
-    });
+    }
+    else{
+      userdb.GetSheetData('shop_info','ALL',['ShopName'],(error, data)=>{
+        console.log(data);
+        res.render('book_home', {
+          venderSel: false,
+          suitSel: false,
+          bookSel: true,
+          shopList: data[0],
+          user: {
+            name: req.session.user.nickname,
+            phone: req.session.user.cellphone,
+            photo: req.session.user.photo
+          },
+          prev: {
+            href: '/suitProcess',
+            title: '查看訂單'
+          }
+        });
+      });
+    }
   }
   else{
-    userdb.GetSheetData('shop_info',{ShopName: req.query.shop_id},['bookTime'],(error, data)=>{
+    userdb.GetSheetData('shop_info',{ShopName: req.query.shop_id},['suittype','cloth'],(error, data)=>{
       console.log(data);
       res.status(200).send({
-        reply: data[0] 
+        reply: data
       });
     });
   }
@@ -593,7 +618,7 @@ app.get('/login', (req, res)=>{
         bookSel: true,
         prev: {
           href: '/',
-          title: 'beforeAfter'
+          title: '回上一頁'
         }
       });
     }
@@ -605,7 +630,7 @@ app.get('/login', (req, res)=>{
           afterServiceSel: false,
           prev: {
             href: '/',
-            title: 'beforeAfter'
+            title: '回上一頁'
           }
         });
       }
@@ -616,7 +641,7 @@ app.get('/login', (req, res)=>{
           afterServiceSel: true,
           prev: {
             href: '/',
-            title: 'beforeAfter'
+            title: '回上一頁'
           }
         });
       }
@@ -703,8 +728,8 @@ app.get('/suitProcess', (req, res)=>{
           processSel: true,
           afterServiceSel: false,
           prev:{
-            href: '/beforeAfter',
-            title: 'beforeAfter'
+            href: '/',
+            title: '回上一頁'
           },
           optionList: optionList,
           processList: processList
@@ -722,20 +747,35 @@ app.get('/afterService', (req, res)=>{
   req.session.location = 'afterServiceSel';
   //if people have yet logined in, ask to login.
   if (typeof req.session.user !== 'undefined')  {
-    userdb.GetSheetData('shop_info', "ALL",
+    if(typeof req.session.shopList !== 'undefined'){
+      res.render('after_service', {
+        layout: 'main_after',
+        processSel: false,
+        afterServiceSel: true,
+        shopList:req.session.shopList,
+        prev: {
+          href: '/',
+          title: '回上一頁'
+        }
+      });
+    }
+    else{
+      userdb.GetSheetData('shop_info', "ALL",
       ['ShopName'],(error, data)=>{
+        req.session.shopList = data[0];
         res.render('after_service', {
           layout: 'main_after',
           processSel: false,
           afterServiceSel: true,
           shopList: data[0],
           prev: {
-            href: '/beforeAfter',
-            title: 'beforeAfter'
+            href: '/',
+            title: '回上一頁'
           }
         });
-      }
-    );
+      });
+    }
+    
   }
   else {
     res.redirect(303,'/login');

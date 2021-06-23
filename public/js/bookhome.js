@@ -16,7 +16,10 @@ $(function(){
         shop: {
           required: true
         },
-        time: {
+        types: {
+          required: true
+        },
+        cloth: {
           required: true
         },
         phone: {
@@ -28,8 +31,11 @@ $(function(){
         shop: {
           required: '*請選擇店家'
         },
-        time: {
-          required: '*請選擇時間'
+        types: {
+          required: '*請選擇種類'
+        },
+        cloth: {
+          required: '*請選擇布料'
         },
         phone: {
           required: '*請輸入電話號碼，如：0999-111-111',
@@ -83,14 +89,15 @@ $(function(){
     var serialData = $(form).serializeObject();
     var _sendData = {
       shop: (serialData.shop || ''),
-      reserv_time: (serialData.time || '')
+      types: (serialData.types || ''),
+      cloth: (serialData.cloth || '')
     };
     $.ajax({
       type: "POST",
       dataType: "json",
       data: _sendData,
       url:  '/bookHome',
-      success: (data) => {
+      success: () => {
         $('input[type=submit]').animate({
           textIndex: 100
         },{
@@ -100,12 +107,12 @@ $(function(){
               'background': ('linear-gradient(90deg, rgba(0, 51, 51, 1) 0%, rgba(0, 51, 51, 1) '+now+'%, rgba(0, 51, 51, 0.5) '+now+'%, rgba(0,51, 51, 0.5) 100%)')
             });
           },
-          complete: function() {
+          complete: ()=>{
             $("input[type=submit]").val("送出成功");
           }
         });
       },
-      error: function(data) {
+      error: ()=>{
         console.log("error");
       }
     });
@@ -126,10 +133,10 @@ $(document).ready(()=>{
       dataType: "json",
       data: {},
       url: '/logout',
-      success: function(data) {
+      success: (data)=> {
         document.location = data.redirectUrl;
       },
-      error: function(err) {
+      error: (err)=>{
         console.log(err);
       }
     });
@@ -147,13 +154,23 @@ $(document).ready(()=>{
       data: _send,
       url: '/bookHome',
       success: (data)=>{
-
-        var option_data = data.reply.map(function(e) {
+        console.log(data);
+        var option_type = data.reply[0].map((e)=>{
           return $("<option value='"+e+"'>"+e+"</option>");
         });
+        var option_cloth = data.reply[1].map((e,index)=>{
+          return $("<option value='"+e+"'>"+(index+1)+"</option>");
+        });
 
-        $("select[name=time] option:not([value=''])").remove("option");
-        $("select[name=time]").append(option_data);
+        $("select[name=types] option:not([value=''])").remove("option");
+        $("select[name=types]").append(option_type);
+        $("select[name=types] option[value='']").attr("disabled","disabled");
+
+
+        $("select[name=cloth] option:not([value=''])").remove("option");
+        $("select[name=cloth]").append(option_cloth);
+        $("select[name=cloth] option[value='']").attr("disabled","disabled");
+        
       },
       error: (error)=>{
         console.log(error);

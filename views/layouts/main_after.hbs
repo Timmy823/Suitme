@@ -35,7 +35,20 @@
   .myitem {
   	text-align: center;
   }
-  
+  div.link-container a {
+    position: fixed;
+    right: 0.4%;
+    top: 8%;
+    background: rgba(0, 82, 82, 1);
+    padding: 0.7% 3%;
+    color: white;
+    opacity: 1;
+    z-index: 100;
+    border-radius: 3px;
+    -webkit-box-shadow: 1px 1px 4px 0px rgb(175 175 175);
+    -moz-box-shadow: 1px 1px 4px 0px rgba(175,175,175,1);
+    box-shadow: 1px 1px 4px 0px rgb(175 175 175);
+}
 	div.my-nav div.row div.column a {
 	  color: 		#BEBEBE;
 	}
@@ -89,7 +102,9 @@
     </div>
 	</div>
 </div>
-
+<div class="link-container">
+  <a href={{prev.href}}>{{prev.title}}</a>
+</div>
 {{{body}}}
 
 {{> loader}}
