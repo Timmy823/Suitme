@@ -330,7 +330,7 @@ app.get('/selectStore',(req,res)=>{
     bookSel: false,
     prev: {
       href: '/',
-      title: '回上一頁'
+      title: '回到首頁'
     }
   });
 });
@@ -566,7 +566,7 @@ app.get('/suitHome', (req, res)=>{
       bookSel: false,
       prev: {
         href: '/',
-        title: '回上一頁'
+        title: '回到首頁'
       }
     });
 });
@@ -669,7 +669,7 @@ app.get('/login', (req, res)=>{
         bookSel: true,
         prev: {
           href: '/',
-          title: '回上一頁'
+          title: '回到首頁'
         }
       });
     }
@@ -681,7 +681,7 @@ app.get('/login', (req, res)=>{
           afterServiceSel: false,
           prev: {
             href: '/',
-            title: '回上一頁'
+            title: '回到首頁'
           }
         });
       }
@@ -692,7 +692,7 @@ app.get('/login', (req, res)=>{
           afterServiceSel: true,
           prev: {
             href: '/',
-            title: '回上一頁'
+            title: '回到首頁'
           }
         });
       }
@@ -786,7 +786,7 @@ app.get('/suitProcess', (req, res)=>{
           afterServiceSel: false,
           prev:{
             href: '/',
-            title: '回上一頁'
+            title: '回到首頁'
           },
           optionList: optionList,
           processList: processList
@@ -812,7 +812,7 @@ app.get('/afterService', (req, res)=>{
         shopList:req.session.shopList,
         prev: {
           href: '/',
-          title: '回上一頁'
+          title: '回到首頁'
         }
       });
     }
@@ -827,7 +827,7 @@ app.get('/afterService', (req, res)=>{
           shopList: data[0],
           prev: {
             href: '/',
-            title: '回上一頁'
+            title: '回到首頁'
           }
         });
       });
@@ -838,7 +838,39 @@ app.get('/afterService', (req, res)=>{
     res.redirect(303,'/login');
   }
 });
+// app.get('/record', (req, res)=>{
+//   let result = new Array();
+//   req.session.hour = 'beforelog';
+//   const shop = req.session.shop || {ShopName:'大帥西服'};
 
+//   userdb.GetSheetData('feedback', {ShopName: shop.ShopName},
+//   ['UserName','Time','Message','Evaluation'],(error,data) => {
+//       if(typeof data !== 'undefined')  {
+//         for(let i = 0; i < data[0].length; i++){
+//           //console.log('feedback: '+data);
+//           result.push({
+//             author:data[0][i],
+//             time:data[1][i],
+//             message:data[2][i],
+//             star:data[3][i][1]
+//           });
+//         }
+//         res.render('feedback', {
+//           venderSel: true,
+//           suitSel: false,
+//           bookSel: false,
+//           comment: result,
+//           prev: {
+//             href: '/venderHome',
+//             title: '回上一頁'
+//           }
+//         });
+//       }
+//       else
+//         console.log('error!!!');
+//     }
+//   );
+// });
 app.use((req, res, next) => {
     res.status(404);
     res.render('404',{

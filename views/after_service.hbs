@@ -3,6 +3,11 @@
 <script src="/js/after_service.js"></script> 
 <div class="ui grid feedback-box">
   <div class="row link-row">
+    <div class="left floated left aligned eight wide column record-container">
+      <div class="record-box">
+        <a href="/record">歷史紀錄</a>
+      </div>
+    </div>
     <div class="right floated right aligned eight wide column logout-container">
       <div class="logout-box">
         <a>登出</a>
@@ -24,7 +29,9 @@
             <option value={{.}}>{{.}}</option>
             {{/each}}
           </select>
-          <label></label>
+          <div class="error-box">
+            <label>*請選擇種類</label>
+          </div>
         </div>
       
         <div class="column Q-title-box">

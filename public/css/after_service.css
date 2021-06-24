@@ -32,7 +32,10 @@
     padding-top: 40px!important;
     padding-bottom: 0rem!important;
   }
-
+  div.record-container div.record-box a {
+    color: white;
+    cursor: pointer;
+  }
   div.logout-container div.logout-box {
     display: inline-block;
     padding-left: 1em;
@@ -79,7 +82,9 @@
   div.select-box select:focus {
     outline: none;
   }
-
+  label {
+    opacity: 0;
+  }
 
   div.Q-title-box,
   div.EV-title-box{
@@ -169,6 +174,14 @@
   div.EV-given input[type="submit"]{
     outline: none;
   }
+    /*error message box */
+    div.error-box {
+      text-align: left;
+    }
+  
+    div.error-box label {
+      font-size: 1rem;
+    }
   div#afterservice_succ_pop_up{
     display: none;
     min-height: 150px;

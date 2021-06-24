@@ -144,6 +144,7 @@ $(document).ready(()=>{
 
   // render book time by ajax data--------------
   $("select[name=shop]").change(function(){
+    $(this).find('option').eq(0).attr("disabled","disabled");
     let _send = {
       shop_id: $(this).val()
     };
