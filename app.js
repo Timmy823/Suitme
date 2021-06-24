@@ -207,7 +207,7 @@ app.post('/register', (req, res)=>{
 });
 app.post('/forget', (req, res) =>{
   console.log(req.body);
-  userdb.GetSheetData('account',JSON.parse(req.body),['email','password'],
+  userdb.GetSheetData('account',JSON.parse(JSON.stringify(req.body)),['email','password'],
     (err,reply) => {
       console.log(reply);
       if(typeof reply !== 'undefined'){

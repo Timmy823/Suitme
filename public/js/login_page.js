@@ -52,7 +52,7 @@ $(document).ready( function() {
         required: "*請輸入帳號"
       },
       password: {
-        required: "*請輸入稱呼"
+        required: "*請輸入密碼"
       }
     },
     showErrors: function(errorMap, errorList){

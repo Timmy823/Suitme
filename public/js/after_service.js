@@ -48,8 +48,8 @@ $(document).ready(function(){
     var is_fault = false;
     console.log(Today);
     var year = Today.getFullYear().toString();
-    var month = Today.getMonth().toString();
-    var day = Today.getDay().toString();
+    var month = (Today.getMonth()+1).toString();
+    var day = Today.getDate().toString();
     var input_time = year.concat('/',month,'/',day);
     
     if (select_bar.val()=='') {
@@ -112,8 +112,8 @@ $(document).ready(function(){
     var is_fault = false;                                          
     console.log(Today);
     var year = Today.getFullYear().toString();
-    var month = Today.getMonth().toString();
-    var day = Today.getDay().toString();
+    var month = (Today.getMonth()+1).toString();
+    var day = Today.getDate().toString();
     var input_time = year.concat('/',month,'/',day);
 
     if (select_bar.val()=='') {
@@ -127,7 +127,7 @@ $(document).ready(function(){
       target.next('label').text('請輸入100個字以內');
       is_fault |= true;
     } else if (message.length == 0) {
-      target.next('label').text('請輸入問題');
+      target.next('label').text('請輸入建議');
       is_fault |= true;
     } else if ( /(\|.*)+/.test(message) ) {
       target.next('label').text('請避免輸入特殊符號"|"');
@@ -155,12 +155,12 @@ $(document).ready(function(){
       dataType:'json',
       data:_input,
       url:'/afterService',
-      success:function(data){
+      success:()=>{
         console.log('send success!');
         $('input[name=evaluation_button]').val('已送出');
         $('input[name=evaluation_button]').css("background","#333333");
       },
-      error:function(data){
+      error:()=>{
         console.log('send error!');
       }
     });
@@ -170,7 +170,7 @@ $(document).ready(function(){
 
 function q_textup() {
   //判斷ID為text的文本區域字數是否超過100個
-  var target = $('textarea[name=question]'),
+  const target = $('textarea[name=question]'),
     q_str = target.val();
 
   if (q_str.length > 100) {
@@ -191,7 +191,7 @@ function e_textup() {
   if (q_str.length > 100) {
     target.next('label').text('請輸入100個字以內');
   } else if (q_str.length == 0) {
-    target.next('label').text('請輸入問題');
+    target.next('label').text('請輸入建議');
   } else if ( /(\|.*)+/.test(q_str) ) {
     target.next('label').text('請避免輸入特殊符號"|"');
   } else {

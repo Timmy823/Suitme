@@ -20,9 +20,9 @@ $(document).ready(()=>{
     $.ajax({
       type:"POST",
       dataType:"json",
-      data: JSON.stringify({
+      data: {
           account:account
-      }),
+      },
       url:'/forget',
       success:(data)=>{
         $('input[type=submit]').val("信件已發送");
