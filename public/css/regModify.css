@@ -104,7 +104,7 @@ input.white-input::-ms-input-placeholder{
 /* using in error format input */
 input.error-input {
   border:1px solid rgba(0,51,51,1) !important;
-  background: rgba(0, 129, 83, .3) !important;
+  background: rgb(170 69 97 / 30%) !important;
 }
 /*---------------------------------*/
 

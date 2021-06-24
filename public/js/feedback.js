@@ -3,7 +3,7 @@
     var star_avg = 0;
     var size = $('.comment').size();
     
-    for(i = 0; i<=size-1; i++){
+    for(let i = 0; i<=size-1; i++){
       var temp = $('.comment .star').eq(i).text();
       star_total = star_total + parseInt(temp);
     }
@@ -11,7 +11,7 @@
     
     star_avg = formatFloat(star_total/size,1);
     console.log(star_avg);
-    for( i =0; i <= Math.floor(star_avg)-1; i++){
+    for(let i =0; i <= Math.floor(star_avg)-1; i++){
       $('.star_form img').eq(i).attr("src","/img/feedback/white_star.png");
     }
     if( star_avg - Math.floor(star_avg) >=0.5){

@@ -1,10 +1,9 @@
 $(document).ready( function() {
-
   $("form#login_form").validate({
     debug: true,
     submitHandler: function(form) {
 
-      var sendData = $("form#login_form").serializeObject();
+      const sendData = $("form#login_form").serializeObject();
       //for (var key in sendData) sendData[key] = "a" + sendData[key];
 
       console.log("start submit");
@@ -24,19 +23,15 @@ $(document).ready( function() {
           } else {
             console.log(data.succLogin);
 
-            var tmpt = $('div#login_false_pop_up').bPopup({
+            $('div#login_false_pop_up').bPopup({
               modalColor: '#333333',
               opacity: 0.6
             });
-            /*
-            $('div#login_false_pop_up').on('click', function(e){
-              tmpt.close();
-            });
-            */
-
+            $("input[name=account]").val("");
+            $("input[name=password]").val("");
           }
         },
-        error: (error) => {
+        error: () => {
           console.log("fail");
         }
       });
@@ -60,7 +55,7 @@ $(document).ready( function() {
         required: "*請輸入稱呼"
       }
     },
-    showErrors: function(errorMap, errorList) {
+    showErrors: function(errorMap, errorList){
       console.log(errorMap);
       console.log($(errorList).each(function(){ console.log(this);}));
       $(errorList).each(function(){
@@ -69,7 +64,7 @@ $(document).ready( function() {
       
       this.defaultShowErrors();
     },
-    errorPlacement: function(error, element) {
+    errorPlacement: () =>{
       return true;
     },
     highlight: function(element, errorClass) {
@@ -101,10 +96,10 @@ $(document).ready( function() {
         Choice:choice
       },
       url:'/login/',
-        success: (data)=>{
+        success: ()=>{
         console.log('send success!');
       },
-      error:(data)=>{
+      error:()=>{
         console.log('send error!');
       }
     });

@@ -114,7 +114,7 @@ app.post('/login',(req, res)=>{
   console.log(login);
   /* if haven't loged in */
   if((typeof Object.keys(login)[0] === 'string')&&(Object.keys(login)[0] == 'Choice')) {
-    req.session.location = req.body.Choice;
+    //req.session.location = req.body.Choice;
     res.status(200).send({succLogin: false, redirectUrl: '/login'});
   }
   else {
@@ -125,12 +125,12 @@ app.post('/login',(req, res)=>{
       console.log('login post api testing for myGetAccountCheck');
       console.log(data);
       if ( typeof data !== 'undefined' ) {
-        req.session.user = data;
+        req.session.user = data[0];
         if((typeof req.session.hour === 'string')&&(req.session.hour == 'beforelog')) {
           res.status(200).send({succLogin: true, redirectUrl: '/bookHome'});
         }
         else if((typeof req.session.hour === 'string')&&(req.session.hour == 'afterlog'))  {
-          if((typeof req.session.location === 'string')&&( req.session.location == 'service')) {
+          if((typeof req.session.location === 'string')&&( req.session.location == 'afterServiceSel')) {
             res.status(200).send({succLogin: true, redirectUrl: '/afterService'});
           }
           else{
@@ -241,6 +241,57 @@ app.post('/bookHome', (req, res)=>{
   res.status(200).send({
     success: true,
     redirectUrl: '/bookHome'
+  });
+});
+app.post('/afterService',function(req,res) {
+  console.log('input feedback'); 
+  
+  var input = Object.keys(req.body);
+  console.log(input);
+
+  //comfirm the identity of the user
+  var person ; 
+  if(req.session.user) {
+    person = req.session.user.nickname;
+  }
+  else {
+    person = "unknown_people";
+  }
+  //comfirm the shop
+  var store ;
+  if(req.body.ShopName) {
+    store = req.body.ShopName;
+  }
+  else {
+    store = "大帥西服";
+  }
+
+  //add data into userdb.js
+  if((typeof input[1] === 'string')&&(input[1] == 'Question')){
+    const _input = {
+      ShopName:store,
+      Time:req.body.time,
+      UserName:person,
+      Question:req.body.Question
+    };
+    console.log(_input);
+    userdb.AddSheetData('question', _input);
+  } 
+  if((typeof input[1] === 'string')&&(input[1] == 'Evaluation')){
+    let str = "-";
+    const star = str.concat(req.body.Evaluation,"-");
+    const _input = {
+      ShopName:store,
+      Time:req.body.time,
+      UserName:person,
+      Evaluation:star,
+      Message:req.body.Message
+    };
+    console.log(_input);
+    userdb.AddSheetData('feedback', _input);
+  }
+  res.status(200).send({
+    redirectUrl: '/afterService'
   });
 });
 app.put('/bookHome', upload.single('file'),  (req, res) => {
@@ -463,7 +514,7 @@ app.get('/cloth', (req, res)=>{
               clothList: result,
               prev: {
                 href: '/venderHome',
-                title: 'venderHome'
+                title: '回上一頁'
               }
           });
         }
@@ -481,7 +532,7 @@ app.get('/feedback', (req, res)=>{
   userdb.GetSheetData('feedback', {ShopName: shop.ShopName},
   ['UserName','Time','Message','Evaluation'],(error,data) => {
       if(typeof data !== 'undefined')  {
-        for(i = 0; i < data[0].length; i++){
+        for(let i = 0; i < data[0].length; i++){
           //console.log('feedback: '+data);
           result.push({
             author:data[0][i],
@@ -497,7 +548,7 @@ app.get('/feedback', (req, res)=>{
           comment: result,
           prev: {
             href: '/venderHome',
-            title: 'venderHome'
+            title: '回上一頁'
           }
         });
       }
@@ -675,22 +726,28 @@ app.get('/forget', (req, res)=>{
   });
 });
 app.get('/regModify', sessExist, (req, res)=> {
+  if (typeof req.session.user === 'undefined') {
+    res.redirect(303,'/login');
+  }
+  else{
     res.render('regModify', {
-        venderSel: false,
-        suitSel: false,
-        bookSel: true,
-        userInfo: {
-          account: req.session.user.account,
-          nickname: req.session.user.nickname,
-          password: req.session.user.password,
-          cellphone: req.session.user.cellphone,
-          email: req.session.user.email
-        },
-        prev: {
-          href: '/bookHome',
-          title: 'bookHome'
-        }
-      });
+      venderSel: false,
+      suitSel: false,
+      bookSel: true,
+      userInfo: {
+        account: req.session.user.account,
+        nickname: req.session.user.nickname,
+        password: req.session.user.password,
+        cellphone: req.session.user.cellphone,
+        email: req.session.user.email
+      },
+      prev: {
+        href: '/bookHome',
+        title: '回上一頁'
+      }
+    });
+  }
+    
 });
 app.get('/suitProcess', (req, res)=>{
   console.log('suitprocess');
