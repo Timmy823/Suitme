@@ -709,7 +709,7 @@ app.get('/register', (req, res)=>{
       bookSel: true,
       prev: {
         href: '/login',
-        title: 'login'
+        title: '回上一頁'
       }
     });
   }
@@ -721,7 +721,7 @@ app.get('/forget', (req, res)=>{
     bookSel: true,
     prev: {
       href: '/login',
-      title: 'login'
+      title: '回上一頁'
     }
   });
 });
