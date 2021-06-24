@@ -95,6 +95,17 @@ $(document).ready(function(){
         console.log('send success!');
         $('input[name=question_button]').val('已送出');
         $('input[name=question_button]').css("background","#333333");
+        setTimeout(function(){
+          $('div#afterservice_succ_pop_up').bPopup({
+            modalColor: '#333333',
+            opacity: 0.6,
+            onClose: ()=>{
+              $('input[name=question_button]').val("送出");
+              $('input[name=question_button]').css("background","#102633");
+              $('textarea[name=question]').val("");
+            }
+          });
+        },500);
       },  
       error:function(data){
         console.log('send error!');
@@ -104,17 +115,17 @@ $(document).ready(function(){
 
   //submit evaluation
   $('input[name=evaluation_button]').on("click",function(event){
-    var Today=new Date();
-    var message = $('textarea[name=evaluation]').val();
-    var shop = $('select[name=shop]').val();
-    var select_bar = $('select[name=shop]');
-    var target = $('textarea[name=evaluation]');
-    var is_fault = false;                                          
+    const Today=new Date();
+    const message = $('textarea[name=evaluation]').val();
+    const shop = $('select[name=shop]').val();
+    let select_bar = $('select[name=shop]');
+    let target = $('textarea[name=evaluation]');
+    let is_fault = false;                                          
     console.log(Today);
-    var year = Today.getFullYear().toString();
-    var month = (Today.getMonth()+1).toString();
-    var day = Today.getDate().toString();
-    var input_time = year.concat('/',month,'/',day);
+    const year = Today.getFullYear().toString();
+    const month = (Today.getMonth()+1).toString();
+    const day = Today.getDate().toString();
+    const input_time = year.concat('/',month,'/',day);
 
     if (select_bar.val()=='') {
       select_bar.next('label').text('請選擇店家');
@@ -159,6 +170,18 @@ $(document).ready(function(){
         console.log('send success!');
         $('input[name=evaluation_button]').val('已送出');
         $('input[name=evaluation_button]').css("background","#333333");
+        setTimeout(function(){
+          $('div#afterservice_succ_pop_up').bPopup({
+            modalColor: '#333333',
+            opacity: 0.6,
+            onClose: ()=>{
+              $('input[name=evaluation_button]').val("送出");
+              $('input[name=evaluation_button]').css("background","#102633");
+              $('textarea[name=evaluation]').val("");
+              $('.star_form>img').attr("src","/img/feedback/gray_star.png");
+            }
+          });
+        },500);
       },
       error:()=>{
         console.log('send error!');

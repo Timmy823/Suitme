@@ -169,5 +169,36 @@
   div.EV-given input[type="submit"]{
     outline: none;
   }
+  div#afterservice_succ_pop_up{
+    display: none;
+    min-height: 150px;
+    min-width: 280px;
+  
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+    text-align: center;
+  
+    pointer-events: none;
+  }
+  div#afterservice_succ_pop_up div.main-afterservice-succ {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  
+  div#afterservice_succ_pop_up div.main-afterservice-succ p {
+    font-size: 35px;
+  }
+  
+  div#afterservice_succ_pop_up div.content-afterservice-succ {
+    padding-bottom: 25px;
+  }
+  
+  div#afterservice_succ_pop_up div.content-afterservice-succ p {
+    font-size: 20px;
+  }
+  
+  div#afterservice_succ_pop_up div.image-afterservice-succ img {
+    height: 40px;
+  }
 
 
